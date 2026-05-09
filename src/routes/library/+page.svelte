@@ -87,7 +87,7 @@
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each data.podcasts as pod}
 				<div class="group bg-surface rounded-2xl overflow-hidden border border-white/5 hover:bg-surface-elevated transition-all duration-300 hover:scale-[1.02] cursor-pointer">
-					<div class="aspect-square bg-gradient-to-br from-primary-container/20 to-black relative">
+					<div class="aspect-square bg-linear-to-br from-primary-container/20 to-black relative">
 						<div class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 group-hover:opacity-40 transition-opacity">
 							📻
 						</div>
