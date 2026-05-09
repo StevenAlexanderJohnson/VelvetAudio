@@ -24,7 +24,7 @@ export const episodes = sqliteTable('episodes', {
 	title: text('title').notNull(),
 	audioUrl: text('audio_url').notNull(),
 	pubDate: text('pub_date').notNull(),
-	downloadedDate: integer('downloaded_date', { mode: 'timestamp' }).notNull().default(new Date())
+	downloadedDate: integer('downloaded_date', { mode: 'timestamp' })
 }, (table) => [
 	index('episode_title_idx').on(table.title)
 ]);

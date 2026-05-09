@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { enhance } from '$app/forms';
+	import { Input } from '$lib';
 
 	let { data, form } = $props();
 	let viewMode = $state<'grid' | 'list'>('grid');
 	let isScanning = $state(false);
 	let isAddModalOpen = $state(false);
 	let isSubmitting = $state(false);
+	let rssUrl = $state("");
 
 	async function handleScan() {
 		isScanning = true;
@@ -164,23 +166,21 @@
 							isSubmitting = false;
 							if (result.type === 'success') {
 								isAddModalOpen = false;
+								rssUrl = "";
 								invalidateAll();
 							}
 						};
 					}}
 					class="space-y-6"
 				>
-					<div>
-						<label for="rssUrl" class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 px-1">RSS Feed URL</label>
-						<input 
-							type="url" 
-							name="rssUrl" 
-							id="rssUrl" 
-							required
-							placeholder="https://example.com/feed.xml"
-							class="w-full bg-background border border-white/10 rounded-xl px-4 py-3 focus:outline-hidden focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all text-on-surface placeholder:text-on-surface-variant/30"
-						/>
-					</div>
+					<Input 
+						bind:value={rssUrl}
+						name="rssUrl"
+						type="url"
+						label="RSS Feed URL"
+						placeholder="https://example.com/feed.xml"
+						required
+					/>
 
 					{#if form?.message}
 						<div class="p-4 rounded-lg bg-error/10 border border-error/20 text-error text-sm">
