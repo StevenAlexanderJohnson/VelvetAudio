@@ -18,7 +18,7 @@ export default async function ScanRssFeeds(feedUrls: ScanTarget[]): Promise<Scan
     return podcasts;
 }
 
-async function scanFeed(target: ScanTarget): Promise<ScanResult> {
+export async function scanFeed(target: ScanTarget): Promise<ScanResult> {
     let feed = await parser.parseURL(target.feedUrl);
 
     return {

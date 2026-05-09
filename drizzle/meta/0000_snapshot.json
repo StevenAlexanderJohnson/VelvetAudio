@@ -1,0 +1,192 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "f5a24f1b-4d1b-4e09-842a-20abaa9ac9b4",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "episodes": {
+      "name": "episodes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "podcast_id": {
+          "name": "podcast_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "guid": {
+          "name": "guid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "audio_url": {
+          "name": "audio_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pub_date": {
+          "name": "pub_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "downloaded_date": {
+          "name": "downloaded_date",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'\"2026-05-09T13:37:39.907Z\"'"
+        }
+      },
+      "indexes": {
+        "episodes_guid_unique": {
+          "name": "episodes_guid_unique",
+          "columns": [
+            "guid"
+          ],
+          "isUnique": true
+        },
+        "episode_title_idx": {
+          "name": "episode_title_idx",
+          "columns": [
+            "title"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "episodes_podcast_id_podcasts_id_fk": {
+          "name": "episodes_podcast_id_podcasts_id_fk",
+          "tableFrom": "episodes",
+          "tableTo": "podcasts",
+          "columnsFrom": [
+            "podcast_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "podcasts": {
+      "name": "podcasts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rss_url": {
+          "name": "rss_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "next_run_at": {
+          "name": "next_run_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "max_downloaded": {
+          "name": "max_downloaded",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "next_run_idx": {
+          "name": "next_run_idx",
+          "columns": [
+            "next_run_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "task": {
+      "name": "task",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

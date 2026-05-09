@@ -22,7 +22,7 @@
 
 <div class="flex flex-col h-screen bg-background">
 	<!-- Sidebar -->
-	<div class="flex w-full overflow-hidden">
+	<div class="flex flex-1 w-full overflow-hidden">
 		<aside
 			class="w-sidebar bg-surface flex flex-col border-r border-white/5"
 		>
@@ -36,22 +36,13 @@
 			</div>
 
 			<nav class="flex-1 px-4 py-2 space-y-1">
-				<a
-					href="/"
-					class="flex items-center gap-3 py-3 bg-linear-to-r px-4 from-white/10 to-transparent text-primary border-l-4 border-primary-container"
-				>
+				<a href="/" class="flex items-center gap-3 py-3 px-4 transition-colors text-on-surface-variant border-l-4 border-transparent hover:bg-white/5">
 					<span class="opacity-80">Home</span>
 				</a>
-				<a
-					href="#"
-					class="flex items-center gap-3 py-3 hover:bg-white/5 px-4 transition-colors text-on-surface-variant border-l-4 border-transparent"
-				>
+				<a href="/library" class="flex items-center gap-3 py-3 px-4 bg-linear-to-r from-white/10 to-transparent text-primary border-l-4 border-primary-container">
 					<span>Library</span>
 				</a>
-				<a
-					href="#"
-					class="flex items-center gap-3 py-3 hover:bg-white/5 px-4 transition-colors text-on-surface-variant border-l-4 border-transparent"
-				>
+				<a href="#" class="flex items-center gap-3 py-3 px-4 hover:bg-white/5 transition-colors text-on-surface-variant border-l-4 border-transparent">
 					<span>Search</span>
 				</a>
 			</nav>
