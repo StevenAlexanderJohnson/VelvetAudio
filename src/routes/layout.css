@@ -1,1 +1,61 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-background: #131313;
+  --color-surface: #1c1b1b;
+  --color-surface-elevated: #2a2a2a;
+  --color-surface-bright: #393939;
+  
+  --color-primary: #e0b6ff;
+  --color-primary-container: #9d4edd;
+  
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #d0c2d5;
+  
+  --font-inter: "Inter", sans-serif;
+  
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  
+  --spacing-sidebar: 280px;
+  --spacing-player: 96px;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-inter antialiased;
+  }
+
+  h1 { @apply text-3xl font-bold tracking-tight; }
+  h2 { @apply text-2xl font-bold tracking-tight; }
+  h3 { @apply text-xl font-semibold; }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary-container);
+    border-radius: 9999px;
+    border: 3px solid var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:bg-surface-elevated hover:scale-[1.02] cursor-pointer;
+  }
+}
