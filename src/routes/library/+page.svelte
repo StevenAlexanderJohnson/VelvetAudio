@@ -119,7 +119,7 @@
 						<tr class="hover:bg-white/5 transition-colors cursor-pointer group">
 							<td class="px-6 py-4">
 								<div class="flex items-center gap-3">
-									<div class="w-10 h-10 rounded bg-surface-elevated flex-shrink-0"></div>
+									<div class="w-10 h-10 rounded bg-surface-elevated shrink-0"></div>
 									<span class="font-bold group-hover:text-primary transition-colors">{pod.name}</span>
 								</div>
 							</td>

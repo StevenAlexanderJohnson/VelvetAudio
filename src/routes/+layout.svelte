@@ -1,8 +1,20 @@
 <script lang="ts">
 	import "./layout.css";
 	import favicon from "$lib/assets/favicon.svg";
+	import { page } from '$app/state';
 
 	let { children } = $props();
+
+	const navItems = [
+		{ label: 'Home', href: '/' },
+		{ label: 'Library', href: '/library' },
+		{ label: 'Search', href: '/search' }
+	];
+
+	// Find active index to position the sliding highlight
+	let activeIndex = $derived(navItems.findIndex(item => 
+		item.href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(item.href)
+	));
 </script>
 
 <svelte:head>
@@ -35,16 +47,24 @@
 				<h1 class="text-xl tracking-tight">Velvet Audio</h1>
 			</div>
 
-			<nav class="flex-1 px-4 py-2 space-y-1">
-				<a href="/" class="flex items-center gap-3 py-3 px-4 transition-colors text-on-surface-variant border-l-4 border-transparent hover:bg-white/5">
-					<span class="opacity-80">Home</span>
-				</a>
-				<a href="/library" class="flex items-center gap-3 py-3 px-4 bg-linear-to-r from-white/10 to-transparent text-primary border-l-4 border-primary-container">
-					<span>Library</span>
-				</a>
-				<a href="#" class="flex items-center gap-3 py-3 px-4 hover:bg-white/5 transition-colors text-on-surface-variant border-l-4 border-transparent">
-					<span>Search</span>
-				</a>
+			<nav class="flex-1 px-4 py-2 space-y-1 relative">
+				<!-- Sliding Highlight Background -->
+				{#if activeIndex !== -1}
+					<div 
+						class="absolute left-4 right-4 h-12 bg-linear-to-r from-white/10 to-transparent border-l-4 border-primary-container transition-all duration-300 ease-out z-0 pointer-events-none"
+						style="transform: translateY({activeIndex * (48 + 4)}px)"
+					></div>
+				{/if}
+
+				{#each navItems as item, i}
+					{@const isActive = activeIndex === i}
+					<a 
+						href={item.href} 
+						class="relative z-10 flex items-center gap-3 py-3 px-4 transition-colors duration-300 {isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}"
+					>
+						<span>{item.label}</span>
+					</a>
+				{/each}
 			</nav>
 
 			<div class="p-6 mt-auto">
@@ -95,10 +115,10 @@
 		<!-- Current Episode -->
 		<div class="flex items-center gap-4 w-1/3">
 			<div
-				class="w-16 h-16 bg-surface-elevated rounded-lg overflow-hidden flex-shrink-0"
+				class="w-16 h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0"
 			>
 				<div
-					class="w-full h-full bg-gradient-to-br from-primary-container/20 to-black"
+					class="w-full h-full bg-linear-to-br from-primary-container/20 to-black"
 				></div>
 			</div>
 			<div class="min-w-0">

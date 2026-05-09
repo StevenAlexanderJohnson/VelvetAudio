@@ -74,7 +74,7 @@
 		<div class="space-y-2">
 			{#each episodes.slice(0, 3) as episode}
 				<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors group cursor-pointer">
-					<div class="w-12 h-12 rounded-md {episode.image} flex-shrink-0"></div>
+					<div class="w-12 h-12 rounded-md {episode.image} shrink-0"></div>
 					<div class="flex-1 min-w-0">
 						<h4 class="font-semibold truncate group-hover:text-primary transition-colors">{episode.title}</h4>
 						<p class="text-xs text-on-surface-variant truncate">{episode.podcast} • {episode.duration}</p>
