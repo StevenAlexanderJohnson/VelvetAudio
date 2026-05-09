@@ -2,6 +2,7 @@ import { db } from '$lib/server/db';
 import { podcast } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import { scanFeed } from '$lib/server/rss/scan';
+import { DownloadEpisode } from '$lib/server/rss/download.js';
 
 export const load = async () => {
 	const podcasts = await db.select().from(podcast);
@@ -30,6 +31,8 @@ export const actions = {
 				nextRunAt: new Date(), // Run scan immediately
 				maxDownloaded: 5 // Default value
 			});
+
+			await DownloadEpisode(metadata.title, metadata.episodes[0].audioUrl); // Download the latest episode immediately
 
 			return { success: true };
 		} catch (e) {
