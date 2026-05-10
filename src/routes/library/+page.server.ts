@@ -1,8 +1,7 @@
 import { db } from '$lib/server/db';
-import { episodes, podcast } from '$lib/server/db/schema';
+import { podcast } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
-import { scanFeed } from '$lib/server/rss/scan';
-import { DownloadEpisode } from '$lib/server/rss/download.js';
+import { AddRssFeed } from '$lib/server/rss/add.js';
 
 export const load = async () => {
 	const podcasts = await db.select().from(podcast);
@@ -20,27 +19,12 @@ export const actions = {
 			return fail(400, { message: 'RSS URL is required' });
 		}
 
-		try {
-			// 1. Scan the feed to get the name and verify it works
-			const metadata = await scanFeed({ id: 0, feedUrl: rssUrl });
+		const result = await AddRssFeed(rssUrl);
 
-			// 2. Save to database
-			await db.insert(podcast).values({
-				name: metadata.title,
-				rssUrl: rssUrl,
-				nextRunAt: new Date(), // Run scan immediately
-				maxDownloaded: 5 // Default value
-			});
-
-			for (const episode of metadata.episodes.slice(0, 5)) {
-				console.log(`Episode: ${episode.title} - ${episode.audioUrl}`);
-				await DownloadEpisode(metadata.title, episode); // Download the latest episode immediately
-			}
-
-			return { success: true };
-		} catch (e) {
-			console.error(e);
-			return fail(500, { message: 'Failed to parse RSS feed. Please check the URL.' });
+		if (!result.success) {
+			return fail(result.status, { message: result.message });
 		}
+
+		return { success: true };
 	}
 };

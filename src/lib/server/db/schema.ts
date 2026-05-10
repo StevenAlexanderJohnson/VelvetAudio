@@ -19,7 +19,7 @@ export const podcast = sqliteTable('podcasts', {
 
 export const episodes = sqliteTable('episodes', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	podcastId: integer('podcast_id').references(() => podcast.id),
+	podcastId: integer('podcast_id').references(() => podcast.id, { onDelete: 'cascade' }).notNull(),
 	guid: text('guid').unique().notNull(),
 	title: text('title').notNull(),
 	audioUrl: text('audio_url').notNull(),
