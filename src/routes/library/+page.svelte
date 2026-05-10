@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	import { Input } from '$lib';
+	import { Input, Button } from '$lib';
 
 	let { data, form } = $props();
 	let viewMode = $state<'grid' | 'list'>('grid');
@@ -33,13 +33,10 @@
 		</div>
 
 		<div class="flex items-center gap-4">
-			<button 
-				onclick={() => isAddModalOpen = true}
-				class="px-6 py-2.5 rounded-lg bg-surface-elevated border border-white/10 text-on-surface font-bold hover:bg-white/10 transition-all flex items-center gap-2"
-			>
+			<Button variant="secondary" onclick={() => isAddModalOpen = true}>
 				<span class="text-xl">+</span>
 				Add Podcast
-			</button>
+			</Button>
 
 			<div class="flex bg-surface rounded-lg p-1 border border-white/5">
 				<button 
@@ -56,10 +53,10 @@
 				</button>
 			</div>
 
-			<button 
+			<Button 
+				variant="primary"
 				onclick={handleScan}
 				disabled={isScanning}
-				class="px-6 py-2.5 rounded-lg bg-primary-container text-white font-bold hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100 flex items-center gap-2 shadow-lg shadow-primary-container/20"
 			>
 				{#if isScanning}
 					<span class="animate-spin text-lg">↻</span>
@@ -67,7 +64,7 @@
 				{:else}
 					<span>Scan Feeds</span>
 				{/if}
-			</button>
+			</Button>
 		</div>
 	</div>
 
@@ -78,12 +75,13 @@
 			</div>
 			<h2 class="text-2xl font-bold mb-2">No podcasts found</h2>
 			<p class="text-on-surface-variant max-w-sm mb-8">You haven't added any RSS feeds yet. Start by adding a new podcast to your library.</p>
-			<button 
+			<Button 
+				variant="secondary"
 				onclick={() => isAddModalOpen = true}
-				class="px-8 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors font-semibold"
+				class="px-8 py-3 rounded-xl"
 			>
 				Add First Podcast
-			</button>
+			</Button>
 			</div>
 		{:else if viewMode === 'grid'}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -189,20 +187,20 @@
 					{/if}
 
 					<div class="flex items-center gap-3 pt-2">
-						<button 
-							type="button" 
+						<Button 
+							variant="secondary"
 							onclick={() => isAddModalOpen = false}
-							class="flex-1 px-6 py-3 rounded-xl hover:bg-white/5 transition-colors font-semibold text-on-surface-variant"
+							class="flex-1"
 						>
 							Cancel
-						</button>
-						<button 
+						</Button>
+						<Button 
 							type="submit" 
 							disabled={isSubmitting}
-							class="flex-1 px-6 py-3 rounded-xl bg-primary-container text-white font-bold hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+							class="flex-1"
 						>
 							{isSubmitting ? 'Subscribing...' : 'Subscribe'}
-						</button>
+						</Button>
 					</div>
 				</form>
 			</div>
