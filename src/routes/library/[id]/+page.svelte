@@ -43,7 +43,7 @@
 					>{data.episodes.length} Episodes</span
 				>
 				<span class="opacity-30">•</span>
-				<span class="font-mono">{data.podcast.rssUrl}</span>
+				<span class="font-mono truncate">{data.podcast.rssUrl}</span>
 			</div>
 		</div>
 	</div>
