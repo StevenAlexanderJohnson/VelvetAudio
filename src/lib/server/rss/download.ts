@@ -4,6 +4,7 @@ import { createWriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { finished } from 'node:stream/promises';
 import { Readable } from 'node:stream';
+import { formatFileName } from './utils';
 
 export async function DownloadEpisode(podcastName: string, episode: App.PodcastEpisode) {
     const downloadPath = join(env.DOWNLOAD_PATH || './downloads', podcastName);
@@ -13,7 +14,7 @@ export async function DownloadEpisode(podcastName: string, episode: App.PodcastE
 
     await mkdir(downloadPath, { recursive: true });
 
-    const fileName = episode.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.mp3';
+    const fileName = formatFileName(episode.title);
     if (!fileName) throw new Error(`Episode path did not provide an episode path\n\t${episode.title}\n\t${episode.audioUrl}`);
     const filePath = join(downloadPath, fileName)
 

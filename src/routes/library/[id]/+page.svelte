@@ -1,8 +1,12 @@
 <script lang="ts">
-	import { Input, Button, PodcastHeader, EpisodeTable } from "$lib";
+	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "$lib";
+	import { enhance } from '$app/forms';
 	let { data } = $props();
 
 	let searchQuery = $state("");
+	let isMenuOpen = $state(false);
+	let isDeleteModalOpen = $state(false);
+	let deleteConfirmName = $state("");
 
 	let filteredEpisodes = $derived(
 		data.episodes.filter((episode) =>
@@ -30,6 +34,8 @@
 			isSyncing = false;
 		}
 	}
+
+	let isNameMatch = $derived(deleteConfirmName === data.podcast.name);
 </script>
 
 <div class="p-8 max-w-7xl mx-auto pb-24">
@@ -42,10 +48,30 @@
 	<!-- Action Bar -->
 	<div class="flex items-center gap-6 mb-8">
 		<Button variant="play">▶</Button>
-		<Button variant="icon">
-			<span class="text-xl">⋮</span>
-		</Button>
+		
+		<div class="relative">
+			<Button variant="icon" onclick={() => isMenuOpen = !isMenuOpen}>
+				<span class="text-xl">⋮</span>
+			</Button>
+			
+			{#if isMenuOpen}
+				<div class="absolute top-full left-0 mt-2 w-48 bg-surface border border-white/10 rounded-xl shadow-2xl z-10 py-2">
+					<button 
+						onclick={() => {
+							isDeleteModalOpen = true;
+							isMenuOpen = false;
+						}}
+						class="w-full text-left px-4 py-2 text-error hover:bg-error/10 transition-colors flex items-center gap-2"
+					>
+						<span>🗑️</span>
+						Delete Podcast
+					</button>
+				</div>
+			{/if}
+		</div>
+
 		<Input bind:value={searchQuery} placeholder="Search episodes..." />
+		
 		<Button
 			variant={isSyncing ? "secondary" : "primary"}
 			class="ml-auto"
@@ -70,3 +96,46 @@
 		</div>
 	{/if}
 </div>
+
+<Modal 
+	isOpen={isDeleteModalOpen} 
+	onClose={() => {
+		isDeleteModalOpen = false;
+		deleteConfirmName = "";
+	}}
+	title="Delete Podcast"
+	description={`Are you sure you want to delete "${data.podcast.name}"? This will remove all episodes and cannot be undone.`}
+>
+	<form method="POST" action="?/delete" use:enhance class="space-y-6">
+		<div class="space-y-2">
+			<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+				Type <span class="text-on-surface select-all font-mono">{data.podcast.name}</span> to confirm
+			</p>
+			<Input 
+				bind:value={deleteConfirmName}
+				placeholder="Confirm podcast name"
+				required
+			/>
+		</div>
+
+		<div class="flex items-center gap-3">
+			<Button 
+				variant="secondary" 
+				onclick={() => {
+					isDeleteModalOpen = false;
+					deleteConfirmName = "";
+				}}
+				class="flex-1"
+			>
+				Cancel
+			</Button>
+			<Button 
+				type="submit" 
+				disabled={!isNameMatch}
+				class="flex-1 bg-error! text-white! shadow-error/20!"
+			>
+				Delete Permanently
+			</Button>
+		</div>
+	</form>
+</Modal>
