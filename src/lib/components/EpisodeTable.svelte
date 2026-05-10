@@ -1,22 +1,9 @@
 <script lang="ts">
 	import DownloadSVG from '$lib/assets/download.svelte';
 	import InfoSVG from '$lib/assets/info.svelte';
+	import type { episodes as episodesSchema } from '$lib/server/db/schema';
 
-	interface Episode {
-		id: number;
-		podcastId: number;
-		guid: string;
-		title: string;
-		link: string;
-		description: string | null;
-		pubDate: string;
-		audioUrl: string;
-		downloadedPath: string | null;
-		downloadedDate: string | null;
-		duration: string | null;
-		fileSize: number | null;
-		mimeType: string | null;
-	}
+	type Episode = typeof episodesSchema.$inferSelect;
 
 	interface Props {
 		episodes: Episode[];
