@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { podcast } from '$lib/server/db/schema';
+import { episodes, podcast } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import { scanFeed } from '$lib/server/rss/scan';
 import { DownloadEpisode } from '$lib/server/rss/download.js';
@@ -32,7 +32,10 @@ export const actions = {
 				maxDownloaded: 5 // Default value
 			});
 
-			await DownloadEpisode(metadata.title, metadata.episodes[0].audioUrl); // Download the latest episode immediately
+			for (const episode of metadata.episodes.slice(0, 5)) {
+				console.log(`Episode: ${episode.title} - ${episode.audioUrl}`);
+				await DownloadEpisode(metadata.title, episode); // Download the latest episode immediately
+			}
 
 			return { success: true };
 		} catch (e) {

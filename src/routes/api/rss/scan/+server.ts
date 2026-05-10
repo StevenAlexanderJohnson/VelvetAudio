@@ -3,7 +3,7 @@ import { episodes, podcast } from "$lib/server/db/schema";
 import { DownloadEpisode } from "$lib/server/rss/download";
 import ScanRssFeeds from "$lib/server/rss/scan";
 import { json } from "@sveltejs/kit";
-import { lte, max, eq } from "drizzle-orm";
+import { max, eq } from "drizzle-orm";
 
 export async function GET() {
     try {
@@ -69,7 +69,7 @@ export async function GET() {
             for (const episode of candidateEpisodes) {
                 try {
                     console.log(`Downloading: ${episode.title}`);
-                    await DownloadEpisode(p.title, episode.audioUrl);
+                    await DownloadEpisode(p.title, episode);
                     
                     await db.update(episodes)
                         .set({ downloadedDate: new Date() })
