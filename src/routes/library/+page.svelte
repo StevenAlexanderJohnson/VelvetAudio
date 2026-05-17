@@ -14,7 +14,9 @@
 	let rssUrl = $state("");
 
 	let filteredPodcasts = $derived(
-		data.podcasts.filter((pod) => pod.name.toLowerCase().includes(searchValue.toLowerCase()))
+		data.podcasts.filter((pod) =>
+			pod.name.toLowerCase().includes(searchValue.toLowerCase()),
+		),
 	);
 
 	// Progress States
@@ -98,7 +100,9 @@
 </script>
 
 <div class="p-8 max-w-7xl mx-auto">
-	<div class="flex items-center justify-between mb-8">
+	<div
+		class="flex flex-col lg:flex-row items-center gap-2 justify-between mb-8"
+	>
 		<div>
 			<h1 class="text-4xl font-bold mb-2">Library</h1>
 			<p class="text-on-surface-variant">
@@ -106,7 +110,7 @@
 			</p>
 		</div>
 
-		<div class="flex items-center gap-4">
+		<div class="flex flex-col md:flex-row items-center gap-4">
 			<Button variant="secondary" onclick={() => (isAddModalOpen = true)}>
 				<span class="text-xl">+</span>
 				Add Podcast
@@ -148,7 +152,11 @@
 		</div>
 	</div>
 	<div class="mb-6">
-		<Input type="text" placeholder="Search podcasts..." bind:value={searchValue} />
+		<Input
+			type="text"
+			placeholder="Search podcasts..."
+			bind:value={searchValue}
+		/>
 	</div>
 
 	{#if data.podcasts.length === 0}
@@ -185,11 +193,19 @@
 					<div
 						class="aspect-square bg-linear-to-br from-primary-container/20 to-black relative"
 					>
-						<div
-							class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 group-hover:opacity-40 transition-opacity"
-						>
-							📻
-						</div>
+						{#if pod.image}
+							<img
+								src={pod.image}
+								alt={pod.name}
+								class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+							/>
+						{:else}
+							<div
+								class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 group-hover:opacity-40 transition-opacity"
+							>
+								📻
+							</div>
+						{/if}
 					</div>
 					<div class="p-5">
 						<h3 class="font-bold text-lg truncate mb-1">
@@ -232,18 +248,23 @@
 				<tbody class="divide-y divide-white/5">
 					{#each data.podcasts as pod}
 						<tr
-							onclick={() =>
-								goto(`/library/${pod.id}`)}
+							onclick={() => goto(`/library/${pod.id}`)}
 							class="hover:bg-white/5 transition-colors cursor-pointer group"
 						>
 							<td class="px-6 py-4">
 								<div class="flex items-center gap-3">
 									{#if pod.image}
-										<img src={pod.image} alt="" class="w-10 h-10 rounded object-cover bg-surface-elevated shrink-0" />
+										<img
+											src={pod.image}
+											alt=""
+											class="w-10 h-10 rounded object-cover bg-surface-elevated shrink-0"
+										/>
 									{:else}
 										<div
 											class="w-10 h-10 rounded bg-surface-elevated shrink-0 flex items-center justify-center text-xs opacity-50"
-										>🎙️</div>
+										>
+											🎙️
+										</div>
 									{/if}
 									<span
 										class="font-bold group-hover:text-primary transition-colors"
@@ -299,7 +320,8 @@
 					if (result.type === "failure") {
 						progressStage = "error";
 						errorMessage =
-							(result.data?.message as string) || "Failed to add podcast.";
+							(result.data?.message as string) ||
+							"Failed to add podcast.";
 					}
 				};
 			}}
