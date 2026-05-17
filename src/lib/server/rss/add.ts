@@ -25,6 +25,7 @@ export async function AddRssFeed(feedUrl: string, requestId?: string): Promise<A
         const [newPodcast] = await db.insert(podcast).values({
             name: feed.title,
             rssUrl: feedUrl,
+            image: feed.image,
             nextRunAt: new Date(),
             maxDownloaded: 5,
         }).returning();
@@ -37,6 +38,7 @@ export async function AddRssFeed(feedUrl: string, requestId?: string): Promise<A
                     podcastId: newPodcast.id,
                     guid: episode.guid || `fallback-${Date.now()}-${Math.random()}`,
                     title: episode.title,
+                    image: episode.image,
                     audioUrl: episode.audioUrl,
                     pubDate: episode.publishDate.toISOString(),
                     downloadedDate: null

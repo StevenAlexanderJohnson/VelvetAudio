@@ -15,6 +15,7 @@ declare global {
 		interface PodcastEpisode {
 			guid: string;
 			title: string;
+			image?: string;
 			audioUrl: string;
 			publishDate: Date;
 			duration?: string; // e.g., "00:45:00"

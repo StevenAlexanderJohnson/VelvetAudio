@@ -11,6 +11,7 @@ export const podcast = sqliteTable('podcasts', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	name: text('name').notNull(),
 	rssUrl: text('rss_url').notNull(),
+	image: text('image'),
 	nextRunAt: integer('next_run_at', { mode: 'timestamp' }).notNull(),
 	maxDownloaded: integer('max_downloaded').notNull(),
 }, (table) => [
@@ -22,6 +23,7 @@ export const episodes = sqliteTable('episodes', {
 	podcastId: integer('podcast_id').references(() => podcast.id),
 	guid: text('guid').unique().notNull(),
 	title: text('title').notNull(),
+	image: text('image'),
 	audioUrl: text('audio_url').notNull(),
 	pubDate: text('pub_date').notNull(),
 	downloadedDate: integer('downloaded_date', { mode: 'timestamp' })

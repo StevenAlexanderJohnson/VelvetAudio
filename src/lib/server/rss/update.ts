@@ -59,6 +59,11 @@ export async function UpdateRssFeed(podcastId: number): Promise<App.RssFeedResul
         }
         const p = scannedPodcasts[0];
 
+        // Update podcast image if it changed
+        if (p.image && p.image !== dbPodcast.image) {
+            await db.update(podcast).set({ image: p.image }).where(eq(podcast.id, podcastId));
+        }
+
         let episodesSynced = 0;
         let episodesDownloaded = 0;
 
@@ -69,10 +74,14 @@ export async function UpdateRssFeed(podcastId: number): Promise<App.RssFeedResul
                     podcastId: p.id,
                     guid: episode.guid || `fallback-${Date.now()}-${Math.random()}`,
                     title: episode.title,
+                    image: episode.image,
                     audioUrl: episode.audioUrl,
                     pubDate: episode.publishDate.toISOString(),
                     downloadedDate: null
-                }).onConflictDoNothing();
+                }).onConflictDoUpdate({
+                    target: episodes.guid,
+                    set: { image: episode.image }
+                });
                 episodesSynced++;
             } catch (err) {
                 console.error(`CRITICAL: Failed to insert episode "${episode.title}":`, err);

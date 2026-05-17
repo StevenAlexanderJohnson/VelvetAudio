@@ -43,6 +43,7 @@ export async function scanFeed(target: ScanTarget): Promise<ScanResult> {
         ).map(item => ({
             guid: item.guid || item.link || '',
             title: item.title || 'Untitled Episode',
+            image: item.itunes?.image || item.image?.url,
             audioUrl: item.enclosure?.url || '',
             publishDate: new Date(item.pubDate || Date.now()),
             duration: item.duration

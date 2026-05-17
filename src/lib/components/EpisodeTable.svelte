@@ -48,13 +48,18 @@
 							</span>
 						</td>
 						<td class="px-8 py-5">
-							<div class="flex flex-col">
-								<span class="font-bold transition-colors {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
-									>{episode.title}</span
-								>
-								<span class="text-xs text-on-surface-variant mt-1"
-									>GUID: {episode.guid.slice(0, 8)}...</span
-								>
+							<div class="flex items-center gap-4">
+								{#if episode.image}
+									<img src={episode.image} alt="" class="w-10 h-10 rounded-lg object-cover bg-surface-elevated shrink-0" />
+								{/if}
+								<div class="flex flex-col min-w-0">
+									<span class="font-bold truncate transition-colors {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
+										>{episode.title}</span
+									>
+									<span class="text-xs text-on-surface-variant mt-1"
+										>GUID: {episode.guid.slice(0, 8)}...</span
+									>
+								</div>
 							</div>
 						</td>
 						<td class="px-8 py-5 text-on-surface-variant text-sm">

@@ -238,9 +238,13 @@
 						>
 							<td class="px-6 py-4">
 								<div class="flex items-center gap-3">
-									<div
-										class="w-10 h-10 rounded bg-surface-elevated shrink-0"
-									></div>
+									{#if pod.image}
+										<img src={pod.image} alt="" class="w-10 h-10 rounded object-cover bg-surface-elevated shrink-0" />
+									{:else}
+										<div
+											class="w-10 h-10 rounded bg-surface-elevated shrink-0 flex items-center justify-center text-xs opacity-50"
+										>🎙️</div>
+									{/if}
 									<span
 										class="font-bold group-hover:text-primary transition-colors"
 										>{pod.name}</span

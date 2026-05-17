@@ -19,6 +19,16 @@
 	const user = $derived(page.data.user);
 	const showChrome = $derived(!!user);
 
+	// Responsive states
+	let isSidebarOpen = $state(false);
+
+	// Close sidebar when navigating
+	$effect(() => {
+		if (page.url.pathname) {
+			isSidebarOpen = false;
+		}
+	});
+
 	// Audio state management
 	let audio = $state<HTMLAudioElement | null>(null);
 	let currentTime = $state(0);
@@ -90,18 +100,33 @@
 	{@render children()}
 {:else}
 	<div class="flex flex-col h-screen bg-background text-on-surface">
-		<!-- Sidebar -->
-		<div class="flex flex-1 w-full overflow-hidden">
+		<div class="flex flex-1 w-full overflow-hidden relative">
+			<!-- Mobile Backdrop -->
+			{#if isSidebarOpen}
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div 
+					class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden" 
+					onclick={() => isSidebarOpen = false}
+				></div>
+			{/if}
+
+			<!-- Sidebar -->
 			<aside
-				class="w-sidebar bg-surface flex flex-col border-r border-white/5"
+				class="fixed inset-y-0 left-0 z-40 w-sidebar bg-surface flex flex-col border-r border-white/5 transform {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0"
 			>
-				<div class="p-8 flex items-center gap-3">
-					<div
-						class="w-8 h-8 bg-primary-container flex items-center justify-center rounded-lg"
-					>
-						<span class="text-white font-bold">V</span>
+				<div class="p-8 flex items-center justify-between">
+					<div class="flex items-center gap-3">
+						<div
+							class="w-8 h-8 bg-primary-container flex items-center justify-center rounded-lg"
+						>
+							<span class="text-white font-bold">V</span>
+						</div>
+						<h1 class="text-xl tracking-tight font-bold">Velvet</h1>
 					</div>
-					<h1 class="text-xl tracking-tight font-bold">Velvet</h1>
+					<button class="md:hidden p-2 hover:bg-white/5 rounded-full" onclick={() => isSidebarOpen = false}>
+						✕
+					</button>
 				</div>
 
 				<nav class="flex-1 px-4 py-2 space-y-1 relative">
@@ -140,23 +165,32 @@
 			<!-- Main Content -->
 			<main class="flex-1 flex flex-col min-w-0">
 				<header
-					class="h-20 flex items-center justify-between px-8 bg-background/80 backdrop-blur-md sticky top-0 z-10"
+					class="h-20 flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-md sticky top-0 z-10 border-b border-white/5 md:border-none"
 				>
-					<div class="flex items-center gap-4">
-						<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Back">←</button>
-						<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Forward">→</button>
+					<div class="flex items-center gap-2 md:gap-4">
+						<button 
+							class="md:hidden p-2 hover:bg-white/5 rounded-full" 
+							aria-label="Open menu"
+							onclick={() => isSidebarOpen = true}
+						>
+							<span class="text-2xl">☰</span>
+						</button>
+						<div class="hidden sm:flex items-center gap-4">
+							<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Back">←</button>
+							<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Forward">→</button>
+						</div>
 					</div>
 					
-					<div class="flex items-center gap-6">
+					<div class="flex items-center gap-3 md:gap-6">
 						<button
-							class="px-6 py-2 rounded-full bg-primary-container text-white font-semibold hover:scale-105 transition-transform hidden md:block"
+							class="px-4 py-1.5 md:px-6 md:py-2 rounded-full bg-primary-container text-white text-sm md:text-base font-semibold hover:scale-105 transition-transform hidden sm:block"
 						>
 							Upgrade
 						</button>
 						
-						<div class="flex items-center gap-4 border-l border-white/10 pl-6">
-							<div class="text-right hidden sm:block">
-								<p class="text-sm font-bold leading-tight">{user?.username}</p>
+						<div class="flex items-center gap-3 md:gap-4 border-l border-white/10 pl-4 md:pl-6">
+							<div class="text-right hidden xs:block">
+								<p class="text-sm font-bold leading-tight truncate max-w-[120px]">{user?.username}</p>
 								<form method="POST" action="/logout">
 									<button class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-error transition-colors font-bold cursor-pointer">
 										Logout
@@ -164,7 +198,7 @@
 								</form>
 							</div>
 							<div
-								class="w-10 h-10 rounded-full bg-primary-container border border-white/10 flex items-center justify-center font-bold text-sm uppercase shadow-lg shadow-primary-container/20"
+								class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary-container border border-white/10 flex items-center justify-center font-bold text-xs md:text-sm uppercase shadow-lg shadow-primary-container/20"
 							>
 								{user?.username.slice(0, 2)}
 							</div>
@@ -180,48 +214,48 @@
 
 		<!-- Playback Bar -->
 		<footer
-			class="h-[96px] bg-surface border-t border-white/5 px-6 flex items-center justify-between z-20"
+			class="h-[96px] bg-surface border-t border-white/5 px-4 md:px-6 flex items-center justify-between z-20"
 		>
 			<!-- Current Episode -->
-			<div class="flex items-center gap-4 w-1/3">
+			<div class="flex items-center gap-3 md:gap-4 w-1/4 md:w-1/3">
 				<div
-					class="w-16 h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0 border border-white/5"
+					class="w-12 h-12 md:w-16 md:h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0 border border-white/5 hidden xs:flex"
 				>
 					<div
-						class="w-full h-full bg-linear-to-br from-primary-container/20 to-black flex items-center justify-center text-2xl"
+						class="w-full h-full bg-linear-to-br from-primary-container/20 to-black flex items-center justify-center text-xl md:text-2xl"
 					>
 						🎙️
 					</div>
 				</div>
 				<div class="min-w-0">
-					<h4 class="font-semibold truncate">{$player.episodeTitle ?? 'Select an episode'}</h4>
-					<p class="text-sm text-on-surface-variant truncate">
+					<h4 class="font-semibold truncate text-sm md:text-base">{$player.episodeTitle ?? 'Select an episode'}</h4>
+					<p class="text-xs md:text-sm text-on-surface-variant truncate">
 						{$player.podcastTitle ?? 'Velvet Audio'}
 					</p>
 				</div>
 			</div>
 
 			<!-- Controls -->
-			<div class="flex flex-col items-center gap-2 w-1/3">
-				<div class="flex items-center gap-6">
+			<div class="flex flex-col items-center gap-1 md:gap-2 w-1/2 md:w-1/3">
+				<div class="flex items-center gap-4 md:gap-6">
 					<button
-						class="text-on-surface-variant hover:text-on-surface transition-colors"
+						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
 						onclick={() => audio && (audio.currentTime -= 15)}>⟲</button
 					>
 					<button
 						disabled={!$player.audioUrl}
 						onclick={() => player.toggle()}
-						class="w-10 h-10 flex items-center justify-center rounded-full bg-on-surface text-background hover:scale-110 transition-transform disabled:opacity-50"
+						class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-on-surface text-background hover:scale-110 transition-transform disabled:opacity-50"
 					>
 						{$player.isPlaying ? '⏸' : '▶'}
 					</button>
 					<button
-						class="text-on-surface-variant hover:text-on-surface transition-colors"
+						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
 						onclick={() => audio && (audio.currentTime += 15)}>⟳</button
 					>
 				</div>
-				<div class="w-full max-w-md flex items-center gap-3">
-					<span class="text-xs text-on-surface-variant font-mono"
+				<div class="w-full max-w-md flex items-center gap-2 md:gap-3">
+					<span class="text-[10px] md:text-xs text-on-surface-variant font-mono"
 						>{formatTime(currentTime)}</span
 					>
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -239,15 +273,15 @@
 							></div>
 						</div>
 					</div>
-					<span class="text-xs text-on-surface-variant font-mono"
+					<span class="text-[10px] md:text-xs text-on-surface-variant font-mono"
 						>{formatTime(duration)}</span
 					>
 				</div>
 			</div>
 
 			<!-- Volume/Extra -->
-			<div class="flex items-center justify-end gap-4 w-1/3">
-				<span class="text-xs text-on-surface-variant uppercase font-bold tracking-widest">MVP Player</span>
+			<div class="flex items-center justify-end gap-4 w-1/4 md:w-1/3">
+				<span class="text-[10px] md:text-xs text-on-surface-variant uppercase font-bold tracking-widest hidden sm:block">MVP Player</span>
 			</div>
 		</footer>
 	</div>

@@ -19,7 +19,7 @@
 			'px-6 py-2.5 bg-surface-elevated border border-white/10 text-on-surface font-bold hover:bg-white/10 rounded-lg',
 		ghost: 'p-3 rounded-full hover:bg-white/5 transition-colors',
 		icon: 'p-3 rounded-full border border-white/10 hover:bg-white/5 transition-colors',
-		play: 'w-14 h-14 bg-primary-container text-white rounded-full flex items-center justify-center text-2xl shadow-xl hover:scale-105 transition-transform'
+		play: 'w-14 h-14 bg-primary-container min-w-14 text-white rounded-full flex items-center justify-center text-2xl shadow-xl hover:scale-105 transition-transform'
 	};
 </script>
 
