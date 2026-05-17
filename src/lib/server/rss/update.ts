@@ -6,10 +6,13 @@ import ScanRssFeeds from "./scan";
 
 export async function UpdateRssFeeds(): Promise<App.RssFeedResult> {
     try {
-        const now = new Date();
-
         // 1. Get ALL podcasts for testing (ignore scheduling for now)
-        const scanPodcasts = await db.select().from(podcast);
+        const scanPodcasts = await db.query.podcast.findMany({
+            columns: {
+                id: true,
+                rssUrl: true,
+            }
+        });
 
         if (scanPodcasts.length === 0) {
             return { success: false, message: "No podcasts found in library.", status: 404 };

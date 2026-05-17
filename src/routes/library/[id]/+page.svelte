@@ -6,6 +6,7 @@
 	let searchQuery = $state("");
 	let isMenuOpen = $state(false);
 	let isDeleteModalOpen = $state(false);
+	let isInfoModalOpen = $state(false);
 	let deleteConfirmName = $state("");
 
 	let filteredEpisodes = $derived(
@@ -58,6 +59,16 @@
 				<div class="absolute top-full left-0 mt-2 w-48 bg-surface border border-white/10 rounded-xl shadow-2xl z-10 py-2">
 					<button 
 						onclick={() => {
+							isInfoModalOpen = true;
+							isMenuOpen = false;
+						}}
+						class="w-full text-left px-4 py-2 text-on-surface hover:bg-white/5 transition-colors flex items-center gap-2"
+					>
+						<span>ℹ️</span>
+						Information
+					</button>
+					<button 
+						onclick={() => {
 							isDeleteModalOpen = true;
 							isMenuOpen = false;
 						}}
@@ -97,6 +108,56 @@
 	{/if}
 </div>
 
+<!-- Information Modal -->
+<Modal 
+	isOpen={isInfoModalOpen} 
+	onClose={() => isInfoModalOpen = false}
+	title="Podcast Information"
+>
+	<div class="space-y-6">
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div>
+				<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Title</p>
+				<p class="text-on-surface font-semibold">{data.podcast.name}</p>
+			</div>
+			<div>
+				<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Max Downloaded</p>
+				<p class="text-on-surface font-semibold">{data.podcast.maxDownloaded} Episodes</p>
+			</div>
+		</div>
+
+		<div>
+			<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">RSS Feed URL</p>
+			<p class="text-on-surface font-mono text-sm break-all p-3 bg-black/20 rounded-lg border border-white/5">
+				{data.podcast.rssUrl}
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div>
+				<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Next Sync Scheduled</p>
+				<p class="text-on-surface">
+					{new Date(data.podcast.nextRunAt).toLocaleString(undefined, {
+						dateStyle: 'medium',
+						timeStyle: 'short'
+					})}
+				</p>
+			</div>
+			<div>
+				<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Library Stats</p>
+				<p class="text-on-surface">{data.episodes.length} Total Episodes</p>
+			</div>
+		</div>
+
+		<div class="pt-4 border-t border-white/5">
+			<Button variant="secondary" onclick={() => isInfoModalOpen = false} class="w-full">
+				Close
+			</Button>
+		</div>
+	</div>
+</Modal>
+
+<!-- Delete Modal -->
 <Modal 
 	isOpen={isDeleteModalOpen} 
 	onClose={() => {
