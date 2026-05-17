@@ -94,7 +94,7 @@
 	</div>
 
 	<!-- Episodes List -->
-	<EpisodeTable episodes={filteredEpisodes} />
+	<EpisodeTable episodes={filteredEpisodes} podcastName={data.podcast.name} />
 
 	{#if data.episodes.length === 0}
 		<div class="py-20 text-center text-on-surface-variant">

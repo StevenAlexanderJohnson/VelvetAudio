@@ -29,7 +29,7 @@ export async function CleanupRssFeed(postcastId: number): Promise<App.RssFeedRes
     }
     let downloadedEpisodes = await db.query.episodes.findMany({
         where: and(
-            eq(podcast.id, postcastId),
+            eq(episodes.podcastId, postcastId),
             isNotNull(episodes.downloadedDate)
         )
     });
@@ -44,6 +44,7 @@ export async function CleanupRssFeed(postcastId: number): Promise<App.RssFeedRes
     // that were automatically downloaded by the system. So we will sort by downloaded date and delete the oldest ones first.
     downloadedEpisodes.sort((a, b) => new Date(a.downloadedDate!).getTime() - new Date(b.downloadedDate!).getTime());
 
+    console.log(`Podcast ${feed.name} has ${downloadedEpisodes.length} downloaded episodes. Max allowed is ${feed.maxDownloaded}. Deleting ${downloadedEpisodes.length - feed.maxDownloaded} old episodes.`);
     const episodesToDelete = downloadedEpisodes.slice(0, downloadedEpisodes.length - feed.maxDownloaded);
     for (const episode of episodesToDelete) {
         try {

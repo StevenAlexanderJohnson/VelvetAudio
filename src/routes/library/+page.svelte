@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from "$app/navigation";
+	import { invalidateAll, goto } from "$app/navigation";
 	import { enhance } from "$app/forms";
 	import { Input, Button, Modal } from "$lib";
 
@@ -233,7 +233,7 @@
 					{#each data.podcasts as pod}
 						<tr
 							onclick={() =>
-								(window.location.href = `/library/${pod.id}`)}
+								goto(`/library/${pod.id}`)}
 							class="hover:bg-white/5 transition-colors cursor-pointer group"
 						>
 							<td class="px-6 py-4">
