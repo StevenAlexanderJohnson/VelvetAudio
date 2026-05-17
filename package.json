@@ -16,6 +16,7 @@
 		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
+		"bcryptjs": "^3.0.3",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {

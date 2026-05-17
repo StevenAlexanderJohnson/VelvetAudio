@@ -19,7 +19,7 @@ export const podcast = sqliteTable('podcasts', {
 
 export const episodes = sqliteTable('episodes', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	podcastId: integer('podcast_id').references(() => podcast.id, { onDelete: 'cascade' }).notNull(),
+	podcastId: integer('podcast_id').references(() => podcast.id),
 	guid: text('guid').unique().notNull(),
 	title: text('title').notNull(),
 	audioUrl: text('audio_url').notNull(),
@@ -28,3 +28,16 @@ export const episodes = sqliteTable('episodes', {
 }, (table) => [
 	index('episode_title_idx').on(table.title)
 ]);
+
+export const user = sqliteTable('users', {
+	id: text('id').primaryKey(),
+	username: text('username').notNull().unique(),
+	email: text('email').notNull().unique(),
+	passwordHash: text('password_hash').notNull()
+});
+
+export const session = sqliteTable('sessions', {
+	id: text('id').primaryKey(),
+	userId: text('user_id').notNull().references(() => user.id),
+	expiresAt: integer('expires_at').notNull()
+});

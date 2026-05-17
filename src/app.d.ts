@@ -3,7 +3,10 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			user: import("./lib/server/db/schema").user.$inferSelect | null;
+			session: import("./lib/server/db/schema").session.$inferSelect | null;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
