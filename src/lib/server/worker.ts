@@ -1,11 +1,11 @@
-import cron from 'node-cron';
+import cron, { type ScheduledTask } from 'node-cron';
 import { db } from './db';
 import { setting } from './db/schema';
 import { eq } from 'drizzle-orm';
 import { UpdateRssFeeds } from './rss/update';
 import { CleanupRssFeeds } from './rss/cleanup';
 
-let currentJob: cron.ScheduledTask | null = null;
+let currentJob: ScheduledTask | null = null;
 
 export async function initWorker() {
     console.log('Initializing background worker...');
