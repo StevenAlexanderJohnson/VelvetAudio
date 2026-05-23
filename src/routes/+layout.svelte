@@ -353,7 +353,7 @@
 				<form method="POST" action="/logout">
 					<Button
 						type="submit"
-						class="w-full !bg-error !text-white hover:!bg-error/80 py-3 font-bold uppercase tracking-widest text-xs"
+						class="w-full bg-error! text-white! hover:bg-error/80! py-3 font-bold uppercase tracking-widest text-xs"
 					>
 						Logout from Device
 					</Button>
