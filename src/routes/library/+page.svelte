@@ -97,6 +97,13 @@
 			eventSource.close();
 		};
 	}
+
+	function handleKeyDown(e: KeyboardEvent, href: string) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			goto(href);
+		}
+	}
 </script>
 
 <div class="p-8 max-w-7xl mx-auto">
@@ -249,7 +256,11 @@
 					{#each data.podcasts as pod}
 						<tr
 							onclick={() => goto(`/library/${pod.id}`)}
-							class="hover:bg-white/5 transition-colors cursor-pointer group"
+							onkeydown={(e) => handleKeyDown(e, `/library/${pod.id}`)}
+							role="button"
+							tabindex="0"
+							aria-label="View {pod.name}"
+							class="hover:bg-white/5 transition-colors cursor-pointer group outline-hidden focus:bg-white/10"
 						>
 							<td class="px-6 py-4">
 								<div class="flex items-center gap-3">

@@ -3,13 +3,15 @@
 	import favicon from "$lib/assets/favicon.svg";
 	import { page } from '$app/state';
 	import { player } from '$lib/player';
+	import { Button, Modal } from '$lib';
 
 	let { children } = $props();
 
 	const navItems = [
 		{ label: 'Home', href: '/' },
 		{ label: 'Library', href: '/library' },
-		{ label: 'Search', href: '/search' }
+		{ label: 'Search', href: '/search' },
+		{ label: 'Settings', href: '/settings' }
 	];
 
 	let activeIndex = $derived(navItems.findIndex(item => 
@@ -21,6 +23,7 @@
 
 	// Responsive states
 	let isSidebarOpen = $state(false);
+	let isUserModalOpen = $state(false);
 
 	// Close sidebar when navigating
 	$effect(() => {
@@ -67,6 +70,16 @@
 		const rect = div.getBoundingClientRect();
 		const percent = (e.clientX - rect.left) / rect.width;
 		audio.currentTime = percent * duration;
+	}
+
+	function handleSeekKeyDown(e: KeyboardEvent) {
+		if (!audio || !duration) return;
+		const step = 5; // seconds
+		if (e.key === 'ArrowRight') {
+			audio.currentTime = Math.min(audio.currentTime + step, duration);
+		} else if (e.key === 'ArrowLeft') {
+			audio.currentTime = Math.max(audio.currentTime - step, 0);
+		}
 	}
 </script>
 
@@ -176,8 +189,16 @@
 							<span class="text-2xl">☰</span>
 						</button>
 						<div class="hidden sm:flex items-center gap-4">
-							<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Back">←</button>
-							<button class="p-2 hover:bg-white/5 rounded-full" aria-label="Forward">→</button>
+							<button 
+								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer" 
+								aria-label="Back"
+								onclick={() => window.history.back()}
+							>←</button>
+							<button 
+								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer" 
+								aria-label="Forward"
+								onclick={() => window.history.forward()}
+							>→</button>
 						</div>
 					</div>
 					
@@ -189,19 +210,13 @@
 						</button>
 						
 						<div class="flex items-center gap-3 md:gap-4 border-l border-white/10 pl-4 md:pl-6">
-							<div class="text-right hidden xs:block">
-								<p class="text-sm font-bold leading-tight truncate max-w-[120px]">{user?.username}</p>
-								<form method="POST" action="/logout">
-									<button class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-error transition-colors font-bold cursor-pointer">
-										Logout
-									</button>
-								</form>
-							</div>
-							<div
-								class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary-container border border-white/10 flex items-center justify-center font-bold text-xs md:text-sm uppercase shadow-lg shadow-primary-container/20"
+							<button 
+								onclick={() => isUserModalOpen = true}
+								class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary-container border border-white/10 flex items-center justify-center font-bold text-xs md:text-sm uppercase shadow-lg shadow-primary-container/20 hover:scale-105 transition-transform cursor-pointer"
+								aria-label="User menu"
 							>
 								{user?.username.slice(0, 2)}
-							</div>
+							</button>
 						</div>
 					</div>
 				</header>
@@ -262,8 +277,16 @@
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						onclick={seek}
-						class="flex-1 h-1 bg-white/10 rounded-full group cursor-pointer relative"
+						onkeydown={handleSeekKeyDown}
+						role="slider"
+						aria-valuemin={0}
+						aria-valuemax={duration}
+						aria-valuenow={currentTime}
+						tabindex="0"
+						aria-label="Seek progress"
+						class="flex-1 h-1 bg-white/10 rounded-full group cursor-pointer relative outline-hidden focus:h-1.5 focus:bg-white/20"
 					>
+
 						<div
 							class="h-full bg-primary-container rounded-full relative group-hover:h-1.5 transition-all"
 							style="width: {(currentTime / (duration || 1)) * 100}%"
@@ -285,6 +308,35 @@
 			</div>
 		</footer>
 	</div>
+
+	<Modal 
+		isOpen={isUserModalOpen} 
+		onClose={() => isUserModalOpen = false} 
+		title="Account"
+	>
+		<div class="space-y-6">
+			<div class="flex items-center gap-4 p-4 bg-surface-elevated rounded-2xl border border-white/5">
+				<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center font-bold text-2xl uppercase shadow-xl">
+					{user?.username.slice(0, 2)}
+				</div>
+				<div class="min-w-0">
+					<p class="text-xl font-bold truncate">{user?.username}</p>
+					<p class="text-sm text-on-surface-variant truncate">{user?.email}</p>
+				</div>
+			</div>
+
+			<div class="space-y-2">
+				<form method="POST" action="/logout">
+					<Button type="submit" class="w-full !bg-error !text-white hover:!bg-error/80 py-3 font-bold uppercase tracking-widest text-xs">
+						Logout from Device
+					</Button>
+				</form>
+				<Button variant="secondary" onclick={() => isUserModalOpen = false} class="w-full py-3">
+					Close
+				</Button>
+			</div>
+		</div>
+	</Modal>
 {/if}
 
 <style>

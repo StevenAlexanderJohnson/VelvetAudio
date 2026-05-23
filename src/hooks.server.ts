@@ -2,6 +2,10 @@ import { validateSessionToken } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { user } from '$lib/server/db/schema';
 import { redirect, type Handle } from '@sveltejs/kit';
+import { initWorker } from '$lib/server/worker';
+
+// Start the background worker
+initWorker();
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get('session');

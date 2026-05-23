@@ -43,3 +43,8 @@ export const session = sqliteTable('sessions', {
 	userId: text('user_id').notNull().references(() => user.id),
 	expiresAt: integer('expires_at').notNull()
 });
+
+export const setting = sqliteTable('settings', {
+	key: text('key').primaryKey(),
+	value: text('value').notNull()
+});

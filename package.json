@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.3",
+		"node-cron": "^4.2.1",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
@@ -26,6 +27,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.2",
 		"@types/node": "^24",
+		"@types/node-cron": "^3.0.11",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
 		"svelte": "^5.55.2",

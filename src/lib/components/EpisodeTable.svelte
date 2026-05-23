@@ -19,6 +19,13 @@
 			podcastName
 		);
 	}
+
+	function handleKeyDown(e: KeyboardEvent, episode: Episode) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			handlePlay(episode);
+		}
+	}
 </script>
 
 <div class="bg-surface rounded-3xl border border-white/5 overflow-hidden">
@@ -39,7 +46,11 @@
 					{@const isCurrent = $player.audioUrl === episode.audioUrl}
 					<tr 
 						onclick={() => handlePlay(episode)}
-						class="hover:bg-white/5 transition-colors group cursor-pointer {isCurrent ? 'bg-white/5' : ''}"
+						onkeydown={(e) => handleKeyDown(e, episode)}
+						role="button"
+						tabindex="0"
+						aria-label="Play {episode.title}"
+						class="hover:bg-white/5 transition-colors group cursor-pointer {isCurrent ? 'bg-white/5' : ''} outline-hidden focus:bg-white/10"
 					>
 						<td class="px-8 py-5 text-on-surface-variant font-mono">
 							<span class={isCurrent ? 'hidden' : 'group-hover:hidden'}>{i + 1}</span>
