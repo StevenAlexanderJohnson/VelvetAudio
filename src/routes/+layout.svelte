@@ -1,22 +1,26 @@
 <script lang="ts">
 	import "./layout.css";
 	import favicon from "$lib/assets/favicon.svg";
-	import { page } from '$app/state';
-	import { player } from '$lib/player';
-	import { Button, Modal } from '$lib';
+	import logo from "$lib/assets/Velvet Audio Transparent.png";
+	import { page } from "$app/state";
+	import { player } from "$lib/player";
+	import { Button, Modal } from "$lib";
 
 	let { children } = $props();
 
 	const navItems = [
-		{ label: 'Home', href: '/' },
-		{ label: 'Library', href: '/library' },
-		{ label: 'Search', href: '/search' },
-		{ label: 'Settings', href: '/settings' }
+		{ label: "Home", href: "/" },
+		{ label: "Library", href: "/library" },
+		{ label: "Search", href: "/search" },
 	];
 
-	let activeIndex = $derived(navItems.findIndex(item => 
-		item.href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(item.href)
-	));
+	let activeIndex = $derived(
+		navItems.findIndex((item) =>
+			item.href === "/"
+				? page.url.pathname === "/"
+				: page.url.pathname.startsWith(item.href),
+		),
+	);
 
 	const user = $derived(page.data.user);
 	const showChrome = $derived(!!user);
@@ -61,7 +65,7 @@
 		if (isNaN(seconds)) return "0:00";
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	}
 
 	function seek(e: MouseEvent) {
@@ -75,9 +79,9 @@
 	function handleSeekKeyDown(e: KeyboardEvent) {
 		if (!audio || !duration) return;
 		const step = 5; // seconds
-		if (e.key === 'ArrowRight') {
+		if (e.key === "ArrowRight") {
 			audio.currentTime = Math.min(audio.currentTime + step, duration);
-		} else if (e.key === 'ArrowLeft') {
+		} else if (e.key === "ArrowLeft") {
 			audio.currentTime = Math.max(audio.currentTime - step, 0);
 		}
 	}
@@ -118,43 +122,51 @@
 			{#if isSidebarOpen}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<div 
-					class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden" 
-					onclick={() => isSidebarOpen = false}
+				<div
+					class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
+					onclick={() => (isSidebarOpen = false)}
 				></div>
 			{/if}
 
 			<!-- Sidebar -->
 			<aside
-				class="fixed inset-y-0 left-0 z-40 w-sidebar bg-surface flex flex-col border-r border-white/5 transform {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0"
+				class="fixed inset-y-0 left-0 z-40 w-sidebar bg-surface flex flex-col border-r border-white/5 transform {isSidebarOpen
+					? 'translate-x-0'
+					: '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0"
 			>
 				<div class="p-8 flex items-center justify-between">
-					<div class="flex items-center gap-3">
-						<div
-							class="w-8 h-8 bg-primary-container flex items-center justify-center rounded-lg"
-						>
-							<span class="text-white font-bold">V</span>
-						</div>
+					<a href="/" class="flex items-center gap-3">
+						<img
+							src={logo}
+							alt="Velvet Audio Logo"
+							class="w-14 h-14 rounded-lg size-fit object-cover"
+						/>
 						<h1 class="text-xl tracking-tight font-bold">Velvet</h1>
-					</div>
-					<button class="md:hidden p-2 hover:bg-white/5 rounded-full" onclick={() => isSidebarOpen = false}>
+					</a>
+					<button
+						class="md:hidden p-2 hover:bg-white/5 rounded-full"
+						onclick={() => (isSidebarOpen = false)}
+					>
 						✕
 					</button>
 				</div>
 
 				<nav class="flex-1 px-4 py-2 space-y-1 relative">
 					{#if activeIndex !== -1}
-						<div 
+						<div
 							class="absolute left-4 right-4 h-12 bg-linear-to-r from-white/10 to-transparent border-l-4 border-primary-container transition-all duration-300 ease-out z-0 pointer-events-none"
-							style="transform: translateY({activeIndex * (48 + 4)}px)"
+							style="transform: translateY({activeIndex *
+								(48 + 4)}px)"
 						></div>
 					{/if}
 
 					{#each navItems as item, i}
 						{@const isActive = activeIndex === i}
-						<a 
-							href={item.href} 
-							class="relative z-10 flex items-center gap-3 py-3 px-4 transition-colors duration-300 {isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}"
+						<a
+							href={item.href}
+							class="relative z-10 flex items-center gap-3 py-3 px-4 transition-colors duration-300 {isActive
+								? 'text-primary'
+								: 'text-on-surface-variant hover:text-on-surface'}"
 						>
 							<span>{item.label}</span>
 						</a>
@@ -162,16 +174,12 @@
 				</nav>
 
 				<div class="p-6 mt-auto">
-					<div
-						class="p-4 rounded-xl bg-surface-elevated border border-white/5"
+					<a
+						href="/settings"
+						class="relative z-10 flex items-center gap-3 py-3 px-4 transition-colors duration-300"
 					>
-						<p
-							class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2"
-						>
-							Support
-						</p>
-						<p class="text-sm opacity-80">Enjoying the experience?</p>
-					</div>
+						<span>Settings</span>
+					</a>
 				</div>
 			</aside>
 
@@ -181,37 +189,34 @@
 					class="h-20 flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-md sticky top-0 z-10 border-b border-white/5 md:border-none"
 				>
 					<div class="flex items-center gap-2 md:gap-4">
-						<button 
-							class="md:hidden p-2 hover:bg-white/5 rounded-full" 
+						<button
+							class="md:hidden p-2 hover:bg-white/5 rounded-full"
 							aria-label="Open menu"
-							onclick={() => isSidebarOpen = true}
+							onclick={() => (isSidebarOpen = true)}
 						>
 							<span class="text-2xl">☰</span>
 						</button>
 						<div class="hidden sm:flex items-center gap-4">
-							<button 
-								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer" 
+							<button
+								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer"
 								aria-label="Back"
-								onclick={() => window.history.back()}
-							>←</button>
-							<button 
-								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer" 
+								onclick={() => window.history.back()}>←</button
+							>
+							<button
+								class="p-2 hover:bg-white/5 rounded-full transition-opacity cursor-pointer"
 								aria-label="Forward"
 								onclick={() => window.history.forward()}
-							>→</button>
+								>→</button
+							>
 						</div>
 					</div>
-					
+
 					<div class="flex items-center gap-3 md:gap-6">
-						<button
-							class="px-4 py-1.5 md:px-6 md:py-2 rounded-full bg-primary-container text-white text-sm md:text-base font-semibold hover:scale-105 transition-transform hidden sm:block"
+						<div
+							class="flex items-center gap-3 md:gap-4 border-l border-white/10 pl-4 md:pl-6"
 						>
-							Upgrade
-						</button>
-						
-						<div class="flex items-center gap-3 md:gap-4 border-l border-white/10 pl-4 md:pl-6">
-							<button 
-								onclick={() => isUserModalOpen = true}
+							<button
+								onclick={() => (isUserModalOpen = true)}
 								class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary-container border border-white/10 flex items-center justify-center font-bold text-xs md:text-sm uppercase shadow-lg shadow-primary-container/20 hover:scale-105 transition-transform cursor-pointer"
 								aria-label="User menu"
 							>
@@ -243,34 +248,43 @@
 					</div>
 				</div>
 				<div class="min-w-0">
-					<h4 class="font-semibold truncate text-sm md:text-base">{$player.episodeTitle ?? 'Select an episode'}</h4>
-					<p class="text-xs md:text-sm text-on-surface-variant truncate">
-						{$player.podcastTitle ?? 'Velvet Audio'}
+					<h4 class="font-semibold truncate text-sm md:text-base">
+						{$player.episodeTitle ?? "Select an episode"}
+					</h4>
+					<p
+						class="text-xs md:text-sm text-on-surface-variant truncate"
+					>
+						{$player.podcastTitle ?? "Velvet Audio"}
 					</p>
 				</div>
 			</div>
 
 			<!-- Controls -->
-			<div class="flex flex-col items-center gap-1 md:gap-2 w-1/2 md:w-1/3">
+			<div
+				class="flex flex-col items-center gap-1 md:gap-2 w-1/2 md:w-1/3"
+			>
 				<div class="flex items-center gap-4 md:gap-6">
 					<button
 						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
-						onclick={() => audio && (audio.currentTime -= 15)}>⟲</button
+						onclick={() => audio && (audio.currentTime -= 15)}
+						>⟲</button
 					>
 					<button
 						disabled={!$player.audioUrl}
 						onclick={() => player.toggle()}
 						class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-on-surface text-background hover:scale-110 transition-transform disabled:opacity-50"
 					>
-						{$player.isPlaying ? '⏸' : '▶'}
+						{$player.isPlaying ? "⏸" : "▶"}
 					</button>
 					<button
 						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
-						onclick={() => audio && (audio.currentTime += 15)}>⟳</button
+						onclick={() => audio && (audio.currentTime += 15)}
+						>⟳</button
 					>
 				</div>
 				<div class="w-full max-w-md flex items-center gap-2 md:gap-3">
-					<span class="text-[10px] md:text-xs text-on-surface-variant font-mono"
+					<span
+						class="text-[10px] md:text-xs text-on-surface-variant font-mono"
 						>{formatTime(currentTime)}</span
 					>
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -286,17 +300,18 @@
 						aria-label="Seek progress"
 						class="flex-1 h-1 bg-white/10 rounded-full group cursor-pointer relative outline-hidden focus:h-1.5 focus:bg-white/20"
 					>
-
 						<div
 							class="h-full bg-primary-container rounded-full relative group-hover:h-1.5 transition-all"
-							style="width: {(currentTime / (duration || 1)) * 100}%"
+							style="width: {(currentTime / (duration || 1)) *
+								100}%"
 						>
 							<div
 								class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
 							></div>
 						</div>
 					</div>
-					<span class="text-[10px] md:text-xs text-on-surface-variant font-mono"
+					<span
+						class="text-[10px] md:text-xs text-on-surface-variant font-mono"
 						>{formatTime(duration)}</span
 					>
 				</div>
@@ -304,34 +319,50 @@
 
 			<!-- Volume/Extra -->
 			<div class="flex items-center justify-end gap-4 w-1/4 md:w-1/3">
-				<span class="text-[10px] md:text-xs text-on-surface-variant uppercase font-bold tracking-widest hidden sm:block">MVP Player</span>
+				<span
+					class="text-[10px] md:text-xs text-on-surface-variant uppercase font-bold tracking-widest hidden sm:block"
+					>MVP Player</span
+				>
 			</div>
 		</footer>
 	</div>
 
-	<Modal 
-		isOpen={isUserModalOpen} 
-		onClose={() => isUserModalOpen = false} 
+	<Modal
+		isOpen={isUserModalOpen}
+		onClose={() => (isUserModalOpen = false)}
 		title="Account"
 	>
 		<div class="space-y-6">
-			<div class="flex items-center gap-4 p-4 bg-surface-elevated rounded-2xl border border-white/5">
-				<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center font-bold text-2xl uppercase shadow-xl">
+			<div
+				class="flex items-center gap-4 p-4 bg-surface-elevated rounded-2xl border border-white/5"
+			>
+				<div
+					class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center font-bold text-2xl uppercase shadow-xl"
+				>
 					{user?.username.slice(0, 2)}
 				</div>
 				<div class="min-w-0">
 					<p class="text-xl font-bold truncate">{user?.username}</p>
-					<p class="text-sm text-on-surface-variant truncate">{user?.email}</p>
+					<p class="text-sm text-on-surface-variant truncate">
+						{user?.email}
+					</p>
 				</div>
 			</div>
 
 			<div class="space-y-2">
 				<form method="POST" action="/logout">
-					<Button type="submit" class="w-full !bg-error !text-white hover:!bg-error/80 py-3 font-bold uppercase tracking-widest text-xs">
+					<Button
+						type="submit"
+						class="w-full !bg-error !text-white hover:!bg-error/80 py-3 font-bold uppercase tracking-widest text-xs"
+					>
 						Logout from Device
 					</Button>
 				</form>
-				<Button variant="secondary" onclick={() => isUserModalOpen = false} class="w-full py-3">
+				<Button
+					variant="secondary"
+					onclick={() => (isUserModalOpen = false)}
+					class="w-full py-3"
+				>
 					Close
 				</Button>
 			</div>
