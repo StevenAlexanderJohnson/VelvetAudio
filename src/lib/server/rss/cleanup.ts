@@ -1,6 +1,10 @@
+import { env } from '$env/dynamic/private';
+import { join } from "node:path";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "../db";
 import { episodes, podcast } from "../db/schema";
+import { formatFileName } from './utils';
+import fs from 'node:fs/promises';
 
 export async function CleanupRssFeeds(): Promise<App.RssFeedResult> {
     let allPodcasts = await db.query.podcast.findMany({
@@ -44,11 +48,15 @@ export async function CleanupRssFeed(postcastId: number): Promise<App.RssFeedRes
     // that were automatically downloaded by the system. So we will sort by downloaded date and delete the oldest ones first.
     downloadedEpisodes.sort((a, b) => new Date(a.downloadedDate!).getTime() - new Date(b.downloadedDate!).getTime());
 
+    const downloadPath = join(env.DOWNLOAD_PATH || './downloads', feed.name);
     console.log(`Podcast ${feed.name} has ${downloadedEpisodes.length} downloaded episodes. Max allowed is ${feed.maxDownloaded}. Deleting ${downloadedEpisodes.length - feed.maxDownloaded} old episodes.`);
     const episodesToDelete = downloadedEpisodes.slice(0, downloadedEpisodes.length - feed.maxDownloaded);
     for (const episode of episodesToDelete) {
         try {
             await db.delete(episodes).where(eq(episodes.id, episode.id));
+            let filePath = join(downloadPath, formatFileName(episode.title));
+            await fs.unlink(filePath);
+            console.log(`Deleted episode with id ${episode.id} and file ${filePath}`);
         } catch (err) {
             console.error(`Failed to delete episode with id ${episode.id}:`, err);
             return { success: false, message: `Failed to delete episode with id ${episode.id}: ${err}`, status: 500 };
