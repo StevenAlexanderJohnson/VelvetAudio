@@ -1,6 +1,5 @@
 import { db } from '$lib/server/db';
 import { setting } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
 import { initWorker } from '$lib/server/worker';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';

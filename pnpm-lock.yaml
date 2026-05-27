@@ -14,6 +14,9 @@ importers:
       node-cron:
         specifier: ^4.2.1
         version: 4.2.1
+      node-id3:
+        specifier: ^0.2.9
+        version: 0.2.9
       rss-parser:
         specifier: ^3.13.0
         version: 3.13.0
@@ -1060,6 +1063,10 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
+  iconv-lite@0.6.2:
+    resolution: {integrity: sha512-2y91h5OpQlolefMPmUlivelittSWy0rP+oYVpn6A7GwVHNE8AWzoYOBNmlwks3LobaJxgHCYZAnyNo2GgpNRNQ==}
+    engines: {node: '>=0.10.0'}
+
   is-reference@3.0.3:
     resolution: {integrity: sha512-ixkJoqQvAP88E6wLydLGGqCJsrFUnqoH6HnaczB8XmDH1oaWU+xxdptvikTgaEhtZ53Ky6YXiBuUI2WXLMCwjw==}
 
@@ -1176,6 +1183,9 @@ packages:
     resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
     engines: {node: '>=6.0.0'}
 
+  node-id3@0.2.9:
+    resolution: {integrity: sha512-dSxhuxrkkGVRgUhDHFxdY0pilzOREcodO01HcZWfaRkCaPWGmo0dOgD8ygyL6ln4Iv4cmfRxAWn1WD9bIB9Bhw==}
+
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
@@ -1211,6 +1221,9 @@ packages:
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
+
+  safer-buffer@2.1.2:
+    resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
   sax@1.6.0:
     resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
@@ -2018,6 +2031,10 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
+  iconv-lite@0.6.2:
+    dependencies:
+      safer-buffer: 2.1.2
+
   is-reference@3.0.3:
     dependencies:
       '@types/estree': 1.0.8
@@ -2106,6 +2123,10 @@ snapshots:
 
   node-cron@4.2.1: {}
 
+  node-id3@0.2.9:
+    dependencies:
+      iconv-lite: 0.6.2
+
   obug@2.1.1: {}
 
   picocolors@1.1.1: {}
@@ -2153,6 +2174,8 @@ snapshots:
   sade@1.8.1:
     dependencies:
       mri: 1.2.0
+
+  safer-buffer@2.1.2: {}
 
   sax@1.6.0: {}
 

@@ -140,7 +140,7 @@ async function ProcessScannedPodcast(p: App.PodcastMetadata & { id: number }): P
 
         for (const episode of candidateEpisodes) {
             try {
-                await DownloadEpisode(p.title, episode);
+                await DownloadEpisode(p, episode);
 
                 await db.update(episodes)
                     .set({ downloadedDate: new Date() })

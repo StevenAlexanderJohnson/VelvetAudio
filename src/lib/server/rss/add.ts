@@ -65,7 +65,15 @@ export async function AddRssFeed(feedUrl: string, requestId?: string): Promise<A
             });
 
             try {
-                await DownloadEpisode(newPodcast.name, episode);
+                // Prepare metadata for tagging
+                const podcastMetadata: App.PodcastMetadata = {
+                    title: newPodcast.name,
+                    description: feed.description,
+                    image: newPodcast.image || undefined,
+                    episodes: [] // Not needed for tagging a single episode
+                };
+
+                await DownloadEpisode(podcastMetadata, episode);
                 await db.update(episodes).set({ downloadedDate: new Date() }).where(
                     and(
                         eq(episodes.podcastId, newPodcast.id),
