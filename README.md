@@ -1,42 +1,85 @@
-# sv
+<p align="center">
+  <img src="src/lib/assets/velvet%20audio.png" width="240" alt="Velvet Audio Logo">
+</p>
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+<h1 align="center">Velvet Audio</h1>
 
-## Creating a project
+<p align="center">
+  <strong>Sophisticated. Electric. Cinematic.</strong><br>
+  <em>A premium, immersive audio management experience for the modern enthusiast.</em>
+</p>
 
-If you're seeing this, you've probably already done this step. Congrats!
+<p align="center">
+  <img src="https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=svelte&logoColor=white" alt="SvelteKit">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black" alt="Drizzle ORM">
+  <img src="https://img.shields.io/badge/LibSQL-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="LibSQL">
+</p>
 
-```sh
-# create a new project
-npx sv create my-app
-```
+---
 
-To recreate this project with the same configuration:
+Velvet Audio is engineered for power users who value a focused, low-distraction environment. By leveraging a **Minimalist** approach with **Glassmorphism** accents, it makes your podcast cover art the centerpiece of a vibrant, high-energy interface.
 
-```sh
-# recreate this project
-deno run npm:sv@0.15.2 create --template minimal --types ts --add tailwindcss="plugins:none" drizzle="database:sqlite+sqlite:libsql" --install deno podmanager
-```
+## ✨ Key Features
 
-## Developing
+- 🎧 **Immersive Playback**: A sophisticated playback bar designed for deep focus.
+- 🌌 **Infinite Depth**: Dark-mode palette (`#121212`) creating a cinematic canvas.
+- ⚡ **Electric Accents**: High-contrast purple (`#9D4EDD`) indicators for active states.
+- 📂 **Smart Library**: Effortless management of shows and episodes with advanced metadata tracking.
+- 🚀 **High-Performance**: Lightning-fast transitions powered by SvelteKit 5 and Vite.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## 🛠️ Technology
 
-```sh
-npm run dev
+- **Core**: [SvelteKit](https://kit.svelte.dev/) (using Svelte 5 Runes)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **ORM**: [Drizzle](https://orm.drizzle.team/)
+- **Database**: [LibSQL](https://turso.tech/libsql) (SQLite compatible)
+- **Utilities**: `rss-parser` for feed ingestion, `node-id3` for metadata management.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## 🚀 Getting Started
 
-## Building
+### Prerequisites
 
-To create a production version of your app:
+- **Node.js** v20.x or higher
+- **pnpm** (or your preferred package manager)
 
-```sh
-npm run build
-```
+### Quick Start
 
-You can preview the production build with `npm run preview`.
+1. **Clone & Install**
+   ```bash
+   git clone https://github.com/yourusername/velvet-audio.git
+   cd velvet-audio
+   pnpm install
+   ```
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+2. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   # Update .env with your local configuration
+   ```
+
+3. **Database Initialization**
+   ```bash
+   pnpm db:push
+   ```
+
+4. **Launch Development**
+   ```bash
+   pnpm dev
+   ```
+
+## 🎨 Design Philosophy
+
+The brand personality is **Sophisticated, Electric, and Cinematic**. 
+
+- **Typography**: Utilizing **Inter** for exceptional legibility and a modern, neutral character.
+- **Shapes**: A rounded language (16px cards, 8px buttons) to evoke a professional yet approachable feel.
+- **Layers**: Depth achieved through tonal layering and subtle 1px outlines rather than heavy shadows.
+
+> Explore the full design specifications in [DESIGN.md](./DESIGN.md).
+
+---
+
+<p align="center">
+  Built with passion by the Velvet Audio team.
+</p>
