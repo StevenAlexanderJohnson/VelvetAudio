@@ -1,4 +1,4 @@
-import { eq, max } from "drizzle-orm";
+import { and, eq, isNotNull, max } from "drizzle-orm";
 import { db } from "../db";
 import { episodes, podcast } from "../db/schema";
 import { DownloadEpisode } from "./download";
@@ -124,11 +124,14 @@ async function ProcessScannedPodcast(p: App.PodcastMetadata & { id: number }): P
 
         // Download logic
         const [latestDownload] = await db
-            .select({ latestDate: max(episodes.downloadedDate) })
+            .select({ latestDate: max(episodes.pubDate) })
             .from(episodes)
-            .where(eq(episodes.podcastId, p.id));
+            .where(and(
+                eq(episodes.podcastId, p.id),
+                isNotNull(episodes.downloadedDate)
+            ));
 
-        const latest = latestDownload?.latestDate;
+        const latest = latestDownload?.latestDate ? new Date(latestDownload.latestDate) : null;
 
         const candidateEpisodes = p.episodes
             .filter(e => !latest || e.publishDate > latest)
