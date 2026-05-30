@@ -1,6 +1,24 @@
 import Parser from 'rss-parser';
 
-const parser = new Parser({
+// Extend the library's types to include itunes and duration
+type CustomItem = Parser.Item & {
+    itunes?: {
+        image?: string;
+    };
+    duration?: string;
+    image?: {
+        url?: string;
+    };
+};
+
+type CustomFeed = {
+    // Parser.Output already has itunes, but we can add image if needed
+    image?: {
+        url?: string;
+    };
+};
+
+const parser: Parser<CustomFeed, CustomItem> = new Parser({
     customFields: {
         item: [['itunes:duration', 'duration']],
     }

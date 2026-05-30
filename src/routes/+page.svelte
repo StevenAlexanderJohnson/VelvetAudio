@@ -74,7 +74,7 @@
 						<div class="pt-4 flex items-center justify-between text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">
 							<span>Downloaded</span>
 							<span>
-								{new Date(episode.downloadedDate).toLocaleDateString(undefined, {
+								{episode.downloadedDate!.toLocaleDateString(undefined, {
 									month: 'short',
 									day: 'numeric'
 								})}
@@ -107,7 +107,7 @@
 								{episode.title}
 							</h4>
 							<p class="text-xs text-on-surface-variant truncate">
-								{episode.podcastName} • {new Date(episode.downloadedDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+								{episode.podcastName} • {episode.downloadedDate!.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
 							</p>
 						</div>
 						<div class="text-primary-container opacity-0 group-hover:opacity-100 transition-opacity">
