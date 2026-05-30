@@ -64,7 +64,8 @@ export async function scanFeed(target: ScanTarget): Promise<ScanResult> {
             image: item.itunes?.image || item.image?.url,
             audioUrl: item.enclosure?.url || '',
             publishDate: new Date(item.pubDate || Date.now()),
-            duration: item.duration
+            duration: item.duration,
+            exemptCleanup: false
         }))
     };
 }

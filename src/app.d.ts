@@ -19,6 +19,7 @@ declare global {
 			audioUrl: string;
 			publishDate: Date;
 			duration?: string; // e.g., "00:45:00"
+			exemptCleanup?: boolean;
 		}
 
 		// The podcast metadata from the feed

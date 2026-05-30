@@ -34,14 +34,15 @@ export async function CleanupRssFeed(postcastId: number): Promise<App.RssFeedRes
     let downloadedEpisodes = await db.query.episodes.findMany({
         where: and(
             eq(episodes.podcastId, postcastId),
-            isNotNull(episodes.downloadedDate)
+            isNotNull(episodes.downloadedDate),
+            eq(episodes.exemptCleanup, false)
         )
     });
     if (downloadedEpisodes.length === 0) {
         return { success: false, message: 'No downloaded episodes found for this podcast.', status: 404 };
     }
-    if (downloadedEpisodes.length == feed.maxDownloaded) {
-        return { success: true, message: 'Podcast is already at max downloaded episodes. No cleanup needed.', status: 200 };
+    if (downloadedEpisodes.length <= feed.maxDownloaded) {
+        return { success: true, message: 'Podcast is at or below max downloaded episodes. No cleanup needed.', status: 200 };
     }
 
     // sort by downloaded date assuming that if they manually downloaded an episode, they want to keep it longer than the ones

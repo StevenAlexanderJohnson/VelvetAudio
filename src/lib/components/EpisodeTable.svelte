@@ -1,8 +1,10 @@
 <script lang="ts">
 	import DownloadSVG from '$lib/assets/download.svelte';
 	import InfoSVG from '$lib/assets/info.svelte';
+	import LockSVG from '$lib/assets/lock.svelte';
 	import type { episodes as episodesSchema } from '$lib/server/db/schema';
 	import { player } from '$lib/player';
+	import { invalidateAll } from '$app/navigation';
 
 	type Episode = typeof episodesSchema.$inferSelect;
 
@@ -24,6 +26,37 @@
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			handlePlay(episode);
+		}
+	}
+
+	async function toggleLock(episode: Episode) {
+		try {
+			const response = await fetch(`/api/episodes/${episode.id}/lock`, {
+				method: 'PATCH'
+			});
+			if (response.ok) {
+				await invalidateAll();
+			} else {
+				alert('Failed to toggle lock status');
+			}
+		} catch (err) {
+			console.error('Error toggling lock:', err);
+		}
+	}
+
+	async function handleDownload(episode: Episode) {
+		try {
+			const response = await fetch(`/api/episodes/${episode.id}/download`, {
+				method: 'POST'
+			});
+			if (response.ok) {
+				await invalidateAll();
+			} else {
+				const err = await response.json();
+				alert(`Failed to download episode: ${err.message}`);
+			}
+		} catch (err) {
+			console.error('Error downloading episode:', err);
 		}
 	}
 </script>
@@ -64,9 +97,18 @@
 									<img src={episode.image} alt="" class="w-10 h-10 rounded-lg object-cover bg-surface-elevated shrink-0" />
 								{/if}
 								<div class="flex flex-col min-w-0">
-									<span class="font-bold truncate transition-colors {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
-										>{episode.title}</span
-									>
+									<div class="flex items-center gap-2">
+										<span class="font-bold truncate transition-colors {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
+											>{episode.title}</span
+										>
+										{#if episode.exemptCleanup}
+											<span class="text-primary" title="Exempt from cleanup">
+												<div class="w-3.5 h-3.5">
+													<LockSVG />
+												</div>
+											</span>
+										{/if}
+									</div>
 									<span class="text-xs text-on-surface-variant mt-1"
 										>GUID: {episode.guid.slice(0, 8)}...</span
 									>
@@ -81,8 +123,15 @@
 							})}
 						</td>
 						<td class="px-8 py-5 text-right">
-							<div class="flex justify-end">
+							<div class="flex justify-end items-center gap-2">
 								{#if episode.downloadedDate}
+									<button
+										title="Toggle Lock"
+										class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors {episode.exemptCleanup ? 'text-primary' : 'text-on-surface-variant'}"
+										onclick={(e) => { e.stopPropagation(); toggleLock(episode); }}
+									>
+										<LockSVG />
+									</button>
 									<button
 										title={`Downloaded on "${new Date(
 											episode.downloadedDate
@@ -94,11 +143,13 @@
 										<InfoSVG />
 									</button>
 								{:else}
-									<div
-										class="w-8 h-8 p-2 rounded-full bg-primary/10 flex items-center justify-center text-on-surface-variant"
+									<button
+										title="Download manually (locks from cleanup)"
+										class="w-8 h-8 p-2 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors"
+										onclick={(e) => { e.stopPropagation(); handleDownload(episode); }}
 									>
 										<DownloadSVG />
-									</div>
+									</button>
 								{/if}
 							</div>
 						</td>
