@@ -3,19 +3,45 @@ import { episodes, podcast } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { DownloadEpisode } from '$lib/server/rss/download';
 import { error, json } from '@sveltejs/kit';
+import { progressManager } from '$lib/server/rss/events';
 
-export async function POST({ params }) {
+export async function POST({ params, url }) {
     const id = parseInt(params.id);
     if (isNaN(id)) throw error(400, 'Invalid episode ID');
 
+    const requestId = url.searchParams.get('requestId');
+    const emit = (event: any) => {
+        if (requestId) progressManager.emit(requestId, event);
+    };
+
     const [episode] = await db.select().from(episodes).where(eq(episodes.id, id));
-    if (!episode) throw error(404, 'Episode not found');
-    if (!episode.podcastId) throw error(400, 'Episode has no associated podcast');
+    if (!episode) {
+        const err = "Episode not found";
+        emit({ type: 'error', message: err });
+        throw error(404, err);
+    }
+    if (!episode.podcastId) {
+        const err = "Episode has no associated podcast";
+        emit({ type: 'error', message: err });
+        throw error(400, err);
+    }
 
     const [pod] = await db.select().from(podcast).where(eq(podcast.id, episode.podcastId));
-    if (!pod) throw error(404, 'Podcast not found');
+    if (!pod) {
+        const err = "Podcast not found";
+        emit({ type: 'error', message: err });
+        throw error(404, err);
+    }
 
     try {
+        emit({ 
+            type: 'downloading', 
+            episode: episode.title, 
+            progress: 0, 
+            current: 1, 
+            total: 1 
+        });
+
         // Map DB types to App types for DownloadEpisode
         const podMeta: App.PodcastMetadata = {
             title: pod.name,
@@ -42,9 +68,11 @@ export async function POST({ params }) {
             })
             .where(eq(episodes.id, id));
 
+        emit({ type: 'success', message: `Successfully downloaded ${episode.title}` });
         return json({ success: true });
     } catch (e: any) {
         console.error('Manual download error:', e);
+        emit({ type: 'error', message: e.message });
         throw error(500, e.message);
     }
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "$lib";
 	import { enhance } from "$app/forms";
+	import { player } from "$lib/player";
 	let { data } = $props();
 
 	let searchQuery = $state("");
@@ -50,7 +51,19 @@
 	<!-- Action Bar -->
 	<div class="flex flex-col lg:flex-row gap-4 mb-8">
 		<div class="flex gap-4">
-			<Button variant="play">▶</Button>
+			<Button
+				variant="play"
+				onclick={() => {
+					if (data.episodes.length > 0) {
+						player.play(data.episodes[0], {
+							name: data.podcast.name,
+							image: data.podcast.image,
+						});
+					}
+				}}
+			>
+				▶
+			</Button>
 
 			<div class="relative">
 				<Button
@@ -104,7 +117,7 @@
 	</div>
 
 	<!-- Episodes List -->
-	<EpisodeTable episodes={filteredEpisodes} podcastName={data.podcast.name} />
+	<EpisodeTable episodes={filteredEpisodes} podcastName={data.podcast.name} podcastImage={data.podcast.image} />
 
 	{#if data.episodes.length === 0}
 		<div class="py-20 text-center text-on-surface-variant">

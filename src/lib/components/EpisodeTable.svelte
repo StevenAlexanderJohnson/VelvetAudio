@@ -5,20 +5,29 @@
 	import type { episodes as episodesSchema } from '$lib/server/db/schema';
 	import { player } from '$lib/player';
 	import { invalidateAll } from '$app/navigation';
+	import { Modal, Button } from '$lib';
 
 	type Episode = typeof episodesSchema.$inferSelect;
 
 	interface Props {
 		episodes: Episode[];
 		podcastName: string;
+		podcastImage?: string | null;
 	}
 
-	let { episodes, podcastName }: Props = $props();
+	let { episodes, podcastName, podcastImage }: Props = $props();
+
+	// Modal & Progress States
+	let isDownloadModalOpen = $state(false);
+	let progressStage = $state<'downloading' | 'success' | 'error'>('downloading');
+	let progressMessage = $state('');
+	let downloadProgress = $state({ current: 0, total: 0, episode: '' });
+	let errorMessage = $state('');
 
 	function handlePlay(episode: Episode) {
 		player.play(
-			{ title: episode.title, audioUrl: episode.audioUrl },
-			podcastName
+			episode,
+			{ name: podcastName, image: podcastImage }
 		);
 	}
 
@@ -44,20 +53,70 @@
 		}
 	}
 
+	function startSSE(requestId: string) {
+		const eventSource = new EventSource(`/api/rss/progress?id=${requestId}`);
+
+		eventSource.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+
+			if (data.type === 'downloading') {
+				progressStage = 'downloading';
+				downloadProgress = {
+					current: data.current,
+					total: data.total,
+					episode: data.episode
+				};
+			} else if (data.type === 'success') {
+				progressStage = 'success';
+				progressMessage = data.message;
+				eventSource.close();
+				invalidateAll();
+			} else if (data.type === 'error') {
+				progressStage = 'error';
+				errorMessage = data.message;
+				eventSource.close();
+			}
+		};
+
+		eventSource.onerror = () => {
+			if (progressStage !== 'success' && progressStage !== 'error') {
+				progressStage = 'error';
+				errorMessage = 'Lost connection to server progress updates.';
+			}
+			eventSource.close();
+		};
+	}
+
 	async function handleDownload(episode: Episode) {
+		const requestId = crypto.randomUUID();
+		isDownloadModalOpen = true;
+		progressStage = 'downloading';
+		downloadProgress = { current: 0, total: 1, episode: episode.title };
+		
+		startSSE(requestId);
+
 		try {
-			const response = await fetch(`/api/episodes/${episode.id}/download`, {
+			const response = await fetch(`/api/episodes/${episode.id}/download?requestId=${requestId}`, {
 				method: 'POST'
 			});
-			if (response.ok) {
-				await invalidateAll();
-			} else {
+			
+			if (!response.ok) {
 				const err = await response.json();
-				alert(`Failed to download episode: ${err.message}`);
+				progressStage = 'error';
+				errorMessage = err.message || 'Failed to download episode.';
 			}
 		} catch (err) {
 			console.error('Error downloading episode:', err);
+			progressStage = 'error';
+			errorMessage = 'An unexpected error occurred.';
 		}
+	}
+
+	function resetModal() {
+		isDownloadModalOpen = false;
+		progressStage = 'downloading';
+		errorMessage = '';
+		progressMessage = '';
 	}
 </script>
 
@@ -159,3 +218,55 @@
 		</table>
 	</div>
 </div>
+
+<Modal
+	isOpen={isDownloadModalOpen}
+	onClose={resetModal}
+	title="Downloading Episode"
+>
+	{#if progressStage === 'downloading'}
+		<div class="py-8">
+			<div class="flex justify-between items-end mb-4">
+				<div class="flex-1 min-w-0 mr-4">
+					<h3 class="text-xl font-bold mb-1">Downloading...</h3>
+					<p class="text-sm text-on-surface-variant truncate">
+						{downloadProgress.episode}
+					</p>
+				</div>
+			</div>
+
+			<div class="w-full h-3 bg-white/5 rounded-full overflow-hidden border border-white/5">
+				<div
+					class="h-full bg-primary-container animate-pulse"
+					style="width: 100%"
+				></div>
+			</div>
+
+			<p class="mt-6 text-center text-xs text-on-surface-variant uppercase tracking-widest font-bold">
+				Please keep this window open
+			</p>
+		</div>
+	{:else if progressStage === 'success'}
+		<div class="py-8 text-center">
+			<div class="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+				✓
+			</div>
+			<h3 class="text-2xl font-bold mb-2">Download Complete!</h3>
+			<p class="text-on-surface-variant mb-8">{progressMessage}</p>
+			<Button variant="secondary" onclick={resetModal} class="w-full">
+				Close
+			</Button>
+		</div>
+	{:else if progressStage === 'error'}
+		<div class="py-8 text-center">
+			<div class="w-20 h-20 bg-error/10 text-error rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+				!
+			</div>
+			<h3 class="text-2xl font-bold mb-2">Download Failed</h3>
+			<p class="text-on-surface-variant mb-8">{errorMessage}</p>
+			<Button variant="primary" onclick={resetModal} class="w-full">
+				Close
+			</Button>
+		</div>
+	{/if}
+</Modal>

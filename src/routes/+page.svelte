@@ -6,8 +6,8 @@
 
 	function handlePlay(episode: any) {
 		player.play(
-			{ title: episode.title, audioUrl: episode.audioUrl },
-			episode.podcastName
+			episode,
+			{ name: episode.podcastName, image: episode.podcastImage }
 		);
 	}
 

@@ -40,6 +40,13 @@
 	let audio = $state<HTMLAudioElement | null>(null);
 	let currentTime = $state(0);
 	let duration = $state(0);
+	let volume = $state(1);
+
+	$effect(() => {
+		if (audio) {
+			audio.volume = volume;
+		}
+	});
 
 	$effect(() => {
 		if ($player.audioUrl && audio) {
@@ -83,6 +90,15 @@
 			audio.currentTime = Math.min(audio.currentTime + step, duration);
 		} else if (e.key === "ArrowLeft") {
 			audio.currentTime = Math.max(audio.currentTime - step, 0);
+		}
+	}
+
+	function handleVolumeKeyDown(e: KeyboardEvent) {
+		const step = 0.1;
+		if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+			volume = Math.min(volume + step, 1);
+		} else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+			volume = Math.max(volume - step, 0);
 		}
 	}
 </script>
@@ -239,13 +255,17 @@
 			<!-- Current Episode -->
 			<div class="flex items-center gap-3 md:gap-4 w-1/4 md:w-1/3">
 				<div
-					class="w-12 h-12 md:w-16 md:h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0 border border-white/5 hidden xs:flex"
+					class="w-10 h-10 md:w-16 md:h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0 border border-white/5 flex"
 				>
-					<div
-						class="w-full h-full bg-linear-to-br from-primary-container/20 to-black flex items-center justify-center text-xl md:text-2xl"
-					>
-						🎙️
-					</div>
+					{#if $player.image}
+						<img src={$player.image} alt="" class="w-full h-full object-cover" />
+					{:else}
+						<div
+							class="w-full h-full bg-linear-to-br from-primary-container/20 to-black flex items-center justify-center text-lg md:text-2xl"
+						>
+							🎙️
+						</div>
+					{/if}
 				</div>
 				<div class="min-w-0">
 					<h4 class="font-semibold truncate text-sm md:text-base">
@@ -318,11 +338,40 @@
 			</div>
 
 			<!-- Volume/Extra -->
-			<div class="flex items-center justify-end gap-4 w-1/4 md:w-1/3">
-				<span
-					class="text-[10px] md:text-xs text-on-surface-variant uppercase font-bold tracking-widest hidden sm:block"
-					>MVP Player</span
+			<div class="flex items-center justify-end gap-3 w-1/4 md:w-1/3">
+				<button 
+					onclick={() => volume = volume === 0 ? 0.7 : 0}
+					class="text-on-surface-variant hover:text-on-surface transition-colors text-sm hidden sm:block"
 				>
+					{volume > 0.5 ? '🔊' : volume > 0 ? '🔉' : '🔇'}
+				</button>
+				<div class="w-24 md:w-32 group flex items-center relative h-6">
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						onclick={(e) => {
+							const rect = e.currentTarget.getBoundingClientRect();
+							volume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+						}}
+						onkeydown={handleVolumeKeyDown}
+						role="slider"
+						aria-valuemin={0}
+						aria-valuemax={1}
+						aria-valuenow={volume}
+						tabindex="0"
+						aria-label="Volume"
+						class="flex-1 h-1 bg-white/10 rounded-full group cursor-pointer relative outline-hidden focus:h-1.5 focus:bg-white/20"
+					>
+						<div
+							class="h-full bg-primary-container rounded-full relative group-hover:h-1.5 transition-all"
+							style="width: {volume * 100}%"
+						>
+							<div
+								class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+							></div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</footer>
 	</div>
