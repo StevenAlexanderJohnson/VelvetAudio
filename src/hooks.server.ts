@@ -1,11 +1,24 @@
 import { validateSessionToken } from '$lib/server/auth';
-import { db } from '$lib/server/db';
+import { db, runMigrations } from '$lib/server/db';
 import { user } from '$lib/server/db/schema';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { initWorker } from '$lib/server/worker';
 
-// Start the background worker
-initWorker();
+// Synchronous initialization wrapper
+async function initialize() {
+	try {
+		// Run migrations on startup and WAIT for them to finish
+		await runMigrations();
+		
+		// ONLY start the worker after migrations are successful
+		await initWorker();
+	} catch (err) {
+		console.error('Critical initialization failure:', err);
+	}
+}
+
+// Fire and forget the initialization but keep the sequence internal
+initialize();
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get('session');

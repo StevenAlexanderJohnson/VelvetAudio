@@ -1,0 +1,9 @@
+.git
+node_modules
+build
+.svelte-kit
+.env
+downloads
+db
+*.db
+pnpm-debug.log
