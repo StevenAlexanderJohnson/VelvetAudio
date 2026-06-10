@@ -2,6 +2,7 @@
 	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "$lib";
 	import { enhance } from "$app/forms";
 	import { player } from "$lib/player";
+	import { onMount } from "svelte";
 	let { data } = $props();
 
 	let searchQuery = $state("");
@@ -10,8 +11,13 @@
 	let isInfoModalOpen = $state(false);
 	let deleteConfirmName = $state("");
 
+	let allEpisodes = $state(data.episodes);
+	let page = $state(1);
+	let isLoadingMore = $state(false);
+	let hasMore = $derived(allEpisodes.length < data.total);
+
 	let filteredEpisodes = $derived(
-		data.episodes.filter((episode) =>
+		allEpisodes.filter((episode) =>
 			episode.title.toLowerCase().includes(searchQuery.toLowerCase()),
 		),
 	);
@@ -37,6 +43,42 @@
 		}
 	}
 
+	async function loadMore() {
+		if (isLoadingMore || !hasMore) return;
+		isLoadingMore = true;
+		
+		try {
+			const nextPage = page + 1;
+			const response = await fetch(`/library/${data.podcast.id}/episodes?page=${nextPage}&pageSize=20`);
+			if (response.ok) {
+				const newData = await response.json();
+				allEpisodes = [...allEpisodes, ...newData.episodes];
+				page = nextPage;
+			}
+		} catch (err) {
+			console.error("Failed to load more episodes:", err);
+		} finally {
+			isLoadingMore = false;
+		}
+	}
+
+	let observer: IntersectionObserver;
+	let observerTarget: HTMLDivElement;
+
+	onMount(() => {
+		observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting) {
+				loadMore();
+			}
+		}, { threshold: 0.1 });
+
+		if (observerTarget) {
+			observer.observe(observerTarget);
+		}
+
+		return () => observer.disconnect();
+	});
+
 	let isNameMatch = $derived(deleteConfirmName === data.podcast.name);
 </script>
 
@@ -45,7 +87,7 @@
 		name={data.podcast.name}
 		rssUrl={data.podcast.rssUrl}
 		image={data.podcast.image}
-		episodeCount={data.episodes.length}
+		episodeCount={data.total}
 	/>
 
 	<!-- Action Bar -->
@@ -54,8 +96,8 @@
 			<Button
 				variant="play"
 				onclick={() => {
-					if (data.episodes.length > 0) {
-						player.play(data.episodes[0], {
+					if (allEpisodes.length > 0) {
+						player.play(allEpisodes[0], {
 							name: data.podcast.name,
 							image: data.podcast.image,
 						});
@@ -119,7 +161,15 @@
 	<!-- Episodes List -->
 	<EpisodeTable episodes={filteredEpisodes} podcastName={data.podcast.name} podcastImage={data.podcast.image} />
 
-	{#if data.episodes.length === 0}
+	<div bind:this={observerTarget} class="h-10 w-full flex items-center justify-center mt-8">
+		{#if isLoadingMore}
+			<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+		{:else if !hasMore && allEpisodes.length > 0}
+			<p class="text-on-surface-variant text-sm italic">No more episodes to load</p>
+		{/if}
+	</div>
+
+	{#if allEpisodes.length === 0}
 		<div class="py-20 text-center text-on-surface-variant">
 			<p>No episodes have been scanned or downloaded yet.</p>
 			<button
@@ -196,7 +246,7 @@
 					Library Stats
 				</p>
 				<p class="text-on-surface">
-					{data.episodes.length} Total Episodes
+					{data.total} Total Episodes
 				</p>
 			</div>
 		</div>

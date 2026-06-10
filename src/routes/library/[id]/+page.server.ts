@@ -1,8 +1,9 @@
 import { db } from '$lib/server/db';
-import { podcast, episodes } from '$lib/server/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { podcast } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 import { error, redirect, type Actions } from '@sveltejs/kit';
 import { DeleteRssFeed } from '$lib/server/rss/delete.js';
+import { getEpisodesPage } from '$lib/server/db/episodes.js';
 
 export const load = async ({ params }) => {
 	const id = parseInt(params.id);
@@ -11,15 +12,12 @@ export const load = async ({ params }) => {
 	const [pod] = await db.select().from(podcast).where(eq(podcast.id, id));
 	if (!pod) throw error(404, 'Podcast not found');
 
-	const podEpisodes = await db
-		.select()
-		.from(episodes)
-		.where(eq(episodes.podcastId, id))
-		.orderBy(desc(episodes.pubDate));
+	const { episodes, total } = await getEpisodesPage(id, 1, 20);
 
 	return {
 		podcast: pod,
-		episodes: podEpisodes
+		episodes,
+		total
 	};
 };
 
