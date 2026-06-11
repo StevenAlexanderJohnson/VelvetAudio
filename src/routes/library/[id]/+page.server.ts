@@ -12,7 +12,7 @@ export const load = async ({ params }) => {
 	const [pod] = await db.select().from(podcast).where(eq(podcast.id, id));
 	if (!pod) throw error(404, 'Podcast not found');
 
-	const { episodes, total } = await getEpisodesPage(id, 1, 20);
+	const { episodes, total } = await getEpisodesPage('', id, 1, 20);
 
 	return {
 		podcast: pod,

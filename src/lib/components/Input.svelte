@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { HTMLInputAttributes } from "svelte/elements";
+
 	interface Props {
 		value?: string;
 		placeholder?: string;
@@ -16,8 +18,9 @@
 		type = "text", 
 		id, 
 		name, 
-		required = false 
-	}: Props = $props();
+		required = false,
+		oninput,
+	}: Props & HTMLInputAttributes = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full">
@@ -36,6 +39,7 @@
 		{name}
 		{placeholder}
 		{required}
+		oninput={oninput}
 		bind:value
 		class="w-full bg-background border border-white/10 rounded-xl px-4 py-3 
                text-on-surface placeholder:text-on-surface-variant/30

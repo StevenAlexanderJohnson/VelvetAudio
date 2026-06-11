@@ -11,9 +11,13 @@ export async function GET({ params, url }) {
         throw error(400, 'Invalid page number');
     }
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+    if (isNaN(pageSize) || pageSize < 1) {
+        throw error(400, 'Invalid page size');
+    }
+    const searchValue = url.searchParams.get('search') || '';
 
     try {
-        const data = await getEpisodesPage(id, page, pageSize);
+        const data = await getEpisodesPage(searchValue, id, page, pageSize);
         return new Response(JSON.stringify(data), { status: 200 });
     } catch (err) {
         console.error(err);

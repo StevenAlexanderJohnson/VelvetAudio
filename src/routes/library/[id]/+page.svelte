@@ -13,14 +13,14 @@
 
 	let allEpisodes = $state(data.episodes);
 	let page = $state(1);
+	let totalCount = $state(data.total);
 	let isLoadingMore = $state(false);
-	let hasMore = $derived(allEpisodes.length < data.total);
+	let hasMore = $derived(allEpisodes.length < totalCount);
+	$inspect(isLoadingMore, "isLoadingMore");
+	$inspect(page, "page");
+	$inspect(totalCount, "totalCount");
+	$inspect(searchQuery, "searchQuery");
 
-	let filteredEpisodes = $derived(
-		allEpisodes.filter((episode) =>
-			episode.title.toLowerCase().includes(searchQuery.toLowerCase()),
-		),
-	);
 
 	let isSyncing = $state(false);
 
@@ -49,10 +49,11 @@
 		
 		try {
 			const nextPage = page + 1;
-			const response = await fetch(`/library/${data.podcast.id}/episodes?page=${nextPage}&pageSize=20`);
+			const response = await fetch(`/library/${data.podcast.id}/episodes?page=${nextPage}&pageSize=20&search=${encodeURIComponent(searchQuery)}`);
 			if (response.ok) {
 				const newData = await response.json();
 				allEpisodes = [...allEpisodes, ...newData.episodes];
+				totalCount = newData.total;
 				page = nextPage;
 			}
 		} catch (err) {
@@ -60,6 +61,28 @@
 		} finally {
 			isLoadingMore = false;
 		}
+	}
+
+	let searchTimeout: ReturnType<typeof setTimeout>;
+
+	async function handleSearch() {
+		clearTimeout(searchTimeout);
+		searchTimeout = setTimeout(async () => {
+			isLoadingMore = true;
+			try {
+				const response = await fetch(`/library/${data.podcast.id}/episodes?page=1&pageSize=20&search=${encodeURIComponent(searchQuery)}`);
+				if (response.ok) {
+					const newData = await response.json();
+					allEpisodes = newData.episodes;
+					totalCount = newData.total;
+					page = 1;
+				}
+			} catch (err) {
+				console.error("Search failed:", err);
+			} finally {
+				isLoadingMore = false;
+			}
+		}, 300);
 	}
 
 	let observer: IntersectionObserver;
@@ -87,7 +110,7 @@
 		name={data.podcast.name}
 		rssUrl={data.podcast.rssUrl}
 		image={data.podcast.image}
-		episodeCount={data.total}
+		episodeCount={totalCount}
 	/>
 
 	<!-- Action Bar -->
@@ -145,7 +168,11 @@
 		</div>
 
 		<div class="flex-1 flex items-center gap-4">
-			<Input bind:value={searchQuery} placeholder="Search episodes..." />
+			<Input 
+				bind:value={searchQuery}
+				oninput={handleSearch} 
+				placeholder="Search episodes..." 
+			/>
 
 			<Button
 				variant={isSyncing ? "secondary" : "primary"}
@@ -159,7 +186,7 @@
 	</div>
 
 	<!-- Episodes List -->
-	<EpisodeTable episodes={filteredEpisodes} podcastName={data.podcast.name} podcastImage={data.podcast.image} />
+	<EpisodeTable episodes={allEpisodes} podcastName={data.podcast.name} podcastImage={data.podcast.image} />
 
 	<div bind:this={observerTarget} class="h-10 w-full flex items-center justify-center mt-8">
 		{#if isLoadingMore}
