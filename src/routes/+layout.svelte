@@ -61,6 +61,35 @@
 		}
 	});
 
+	document.addEventListener("keydown", (e) => {
+		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+			return; // Don't interfere with typing
+		}
+
+		switch (e.code) {
+			case "Space":
+				e.preventDefault();
+				player.toggle();
+				break;
+			case "ArrowRight":
+				if (audio) audio.currentTime = Math.min(audio.currentTime + 5, duration);
+				break;
+			case "ArrowLeft":
+				if (audio) audio.currentTime = Math.max(audio.currentTime - 5, 0);
+				break;
+			case "ArrowUp":
+				e.preventDefault();
+				volume = Math.min(volume + 0.05, 1);
+				break;
+			case "ArrowDown":
+				e.preventDefault();
+				volume = Math.max(volume - 0.05, 0);
+				break;
+			default:
+				break;
+		}
+	})
+
 	function handleTimeUpdate() {
 		if (audio) currentTime = audio.currentTime;
 	}
@@ -91,15 +120,6 @@
 			audio.currentTime = Math.min(audio.currentTime + step, duration);
 		} else if (e.key === "ArrowLeft") {
 			audio.currentTime = Math.max(audio.currentTime - step, 0);
-		}
-	}
-
-	function handleVolumeKeyDown(e: KeyboardEvent) {
-		const step = 0.1;
-		if (e.key === "ArrowUp" || e.key === "ArrowRight") {
-			volume = Math.min(volume + step, 1);
-		} else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
-			volume = Math.max(volume - step, 0);
 		}
 	}
 </script>
@@ -368,7 +388,6 @@
 							const rect = e.currentTarget.getBoundingClientRect();
 							volume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
 						}}
-						onkeydown={handleVolumeKeyDown}
 						role="slider"
 						aria-valuemin={0}
 						aria-valuemax={1}
@@ -543,7 +562,6 @@
 							Math.min(1, (e.clientX - rect.left) / rect.width),
 						);
 					}}
-					onkeydown={handleVolumeKeyDown}
 					role="slider"
 					aria-valuemin={0}
 					aria-valuemax={1}
