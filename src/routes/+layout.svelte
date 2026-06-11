@@ -41,7 +41,7 @@
 	let audio = $state<HTMLAudioElement | null>(null);
 	let currentTime = $state(0);
 	let duration = $state(0);
-	let volume = $state(1);
+	let volume = $state(.5);
 
 	$effect(() => {
 		if (audio) {

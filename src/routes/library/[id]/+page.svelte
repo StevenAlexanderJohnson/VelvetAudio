@@ -16,10 +16,6 @@
 	let totalCount = $state(data.total);
 	let isLoadingMore = $state(false);
 	let hasMore = $derived(allEpisodes.length < totalCount);
-	$inspect(isLoadingMore, "isLoadingMore");
-	$inspect(page, "page");
-	$inspect(totalCount, "totalCount");
-	$inspect(searchQuery, "searchQuery");
 
 
 	let isSyncing = $state(false);
