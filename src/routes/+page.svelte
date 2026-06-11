@@ -7,7 +7,7 @@
 	function handlePlay(episode: any) {
 		player.play(
 			episode,
-			{ name: episode.podcastName, image: episode.podcastImage }
+			{ name: episode.podcastName, id: episode.podcastId, image: episode.podcastImage }
 		);
 	}
 

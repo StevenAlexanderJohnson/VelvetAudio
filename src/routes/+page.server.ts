@@ -11,6 +11,7 @@ export const load: PageServerLoad = async () => {
 			image: episodes.image,
 			audioUrl: episodes.audioUrl,
 			downloadedDate: episodes.downloadedDate,
+			podcastId: podcast.id,
 			podcastName: podcast.name,
             podcastImage: podcast.image
 		})

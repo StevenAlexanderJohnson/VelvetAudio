@@ -12,10 +12,11 @@
 	interface Props {
 		episodes: Episode[];
 		podcastName: string;
+		podcastId: number;
 		podcastImage?: string | null;
 	}
 
-	let { episodes, podcastName, podcastImage }: Props = $props();
+	let { episodes, podcastName, podcastId, podcastImage }: Props = $props();
 
 	// Modal & Progress States
 	let isDownloadModalOpen = $state(false);
@@ -27,7 +28,7 @@
 	let errorMessage = $state("");
 
 	function handlePlay(episode: Episode) {
-		player.play(episode, { name: podcastName, image: podcastImage });
+		player.play(episode, { name: podcastName, id: podcastId, image: podcastImage });
 	}
 
 	function handleKeyDown(e: KeyboardEvent, episode: Episode) {
@@ -134,6 +135,7 @@
 					<th class="px-8 py-5 w-16 hidden sm:table-cell">#</th>
 					<th class="px-8 py-5">Title</th>
 					<th class="px-8 py-5">Release Date</th>
+					<th class="px-8 py-5 text-center">Progress</th>
 					<th class="px-8 py-5 text-right">Status</th>
 				</tr>
 			</thead>
@@ -177,42 +179,44 @@
 								<div class="flex flex-col min-w-0">
 									<div class="flex items-center gap-2">
 										<span
-											class="font-bold truncate transition-colors text-ellipsis max-w-32 md:max-w-64 lg:max-w-lg {isCurrent
-												? 'text-primary'
-												: 'text-on-surface group-hover:text-primary'}"
+											class="font-bold truncate transition-colors text-ellipsis max-w-32 md:max-w-64 lg:max-w-lg {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
+											>{episode.title}</span
 										>
-											{episode.title}
-										</span>
 										{#if episode.exemptCleanup}
-											<span
-												class="text-primary"
-												title="Exempt from cleanup"
-											>
+											<span class="text-primary" title="Exempt from cleanup">
 												<div class="w-3.5 h-3.5">
 													<LockSVG />
 												</div>
 											</span>
 										{/if}
 									</div>
-									<span
-										class="text-xs text-on-surface-variant mt-1"
-										>GUID: {episode.guid.slice(
-											0,
-											8,
-										)}...</span
+									<span class="text-xs text-on-surface-variant mt-1"
+										>GUID: {episode.guid.slice(0, 8)}...</span
 									>
 								</div>
 							</div>
 						</td>
-						<td class="px-8 py-5 text-on-surface-variant text-sm">
-							{new Date(episode.pubDate).toLocaleDateString(
-								undefined,
-								{
-									year: "numeric",
-									month: "short",
-									day: "numeric",
-								},
-							)}
+						<td class="px-8 py-5 text-on-surface-variant text-sm whitespace-nowrap">
+							{new Date(episode.pubDate).toLocaleDateString(undefined, {
+								year: "numeric",
+								month: "short",
+								day: "numeric",
+							})}
+						</td>
+						<td class="px-8 py-5 text-center">
+							{#if episode.completed}
+								<span class="text-primary font-bold text-[10px] uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md">Done</span>
+							{:else if (episode.listenProgress ?? 0) > 0}
+								<span class="text-on-surface-variant text-xs font-mono">
+									{Math.floor((episode.listenProgress ?? 0) / 60)}:{(
+										(episode.listenProgress ?? 0) % 60
+									)
+										.toString()
+										.padStart(2, "0")}
+								</span>
+							{:else}
+								<span class="text-on-surface-variant/30 text-xs">--:--</span>
+							{/if}
 						</td>
 						<td class="px-8 py-5 text-right">
 							<div class="flex justify-end items-center gap-2">

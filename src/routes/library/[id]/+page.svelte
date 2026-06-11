@@ -14,6 +14,13 @@
 	let allEpisodes = $state(data.episodes);
 	let page = $state(1);
 	let totalCount = $state(data.total);
+
+	$effect(() => {
+		allEpisodes = data.episodes;
+		totalCount = data.total;
+		page = 1;
+	});
+
 	let isLoadingMore = $state(false);
 	let hasMore = $derived(allEpisodes.length < totalCount);
 
@@ -118,6 +125,7 @@
 					if (allEpisodes.length > 0) {
 						player.play(allEpisodes[0], {
 							name: data.podcast.name,
+							id: data.podcast.id,
 							image: data.podcast.image,
 						});
 					}
@@ -182,7 +190,12 @@
 	</div>
 
 	<!-- Episodes List -->
-	<EpisodeTable episodes={allEpisodes} podcastName={data.podcast.name} podcastImage={data.podcast.image} />
+	<EpisodeTable 
+		episodes={allEpisodes} 
+		podcastName={data.podcast.name} 
+		podcastId={data.podcast.id}
+		podcastImage={data.podcast.image} 
+	/>
 
 	<div bind:this={observerTarget} class="h-10 w-full flex items-center justify-center mt-8">
 		{#if isLoadingMore}

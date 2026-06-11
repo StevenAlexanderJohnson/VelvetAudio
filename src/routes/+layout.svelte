@@ -41,7 +41,8 @@
 	let audio = $state<HTMLAudioElement | null>(null);
 	let currentTime = $state(0);
 	let duration = $state(0);
-	let volume = $state(.5);
+	let volume = $state(0.5);
+	let lastSyncedTime = 0;
 
 	$effect(() => {
 		if (audio) {
@@ -61,37 +62,75 @@
 		}
 	});
 
-	document.addEventListener("keydown", (e) => {
-		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-			return; // Don't interfere with typing
-		}
+	if (typeof window !== "undefined") {
+		document.addEventListener("keydown", (e) => {
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement
+			) {
+				return; // Don't interfere with typing
+			}
 
-		switch (e.code) {
-			case "Space":
-				e.preventDefault();
-				player.toggle();
-				break;
-			case "ArrowRight":
-				if (audio) audio.currentTime = Math.min(audio.currentTime + 5, duration);
-				break;
-			case "ArrowLeft":
-				if (audio) audio.currentTime = Math.max(audio.currentTime - 5, 0);
-				break;
-			case "ArrowUp":
-				e.preventDefault();
-				volume = Math.min(volume + 0.05, 1);
-				break;
-			case "ArrowDown":
-				e.preventDefault();
-				volume = Math.max(volume - 0.05, 0);
-				break;
-			default:
-				break;
-		}
-	})
+			switch (e.code) {
+				case "Space":
+					e.preventDefault();
+					player.toggle();
+					break;
+				case "ArrowRight":
+					if (audio)
+						audio.currentTime = Math.min(
+							audio.currentTime + 5,
+							duration,
+						);
+					break;
+				case "ArrowLeft":
+					if (audio)
+						audio.currentTime = Math.max(audio.currentTime - 5, 0);
+					break;
+				case "ArrowUp":
+					e.preventDefault();
+					volume = Math.min(volume + 0.05, 1);
+					break;
+				case "ArrowDown":
+					e.preventDefault();
+					volume = Math.max(volume - 0.05, 0);
+					break;
+				default:
+					break;
+			}
+		});
+	}
 
-	function handleTimeUpdate() {
-		if (audio) currentTime = audio.currentTime;
+	async function handleTimeUpdate() {
+		if (!audio) return;
+		
+		currentTime = audio.currentTime;
+
+		// Sync every 5 seconds, or if significantly skipped, or if near end
+		const isSignificantSkip = Math.abs(currentTime - lastSyncedTime) > 5;
+		const isNearEnd = currentTime / duration > 0.9;
+		const shouldSync = isSignificantSkip || (currentTime % 5 < 0.3 && Math.abs(currentTime - lastSyncedTime) > 1);
+
+		if ($player.episodeId && $player.podcastId && (isSignificantSkip || shouldSync)) {
+			lastSyncedTime = currentTime;
+			try {
+				await fetch(
+					`/library/${$player.podcastId}/episodes/${$player.episodeId}`,
+					{
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							currentTime: currentTime,
+							completed: isNearEnd,
+						}),
+					},
+				);
+			} catch (err) {
+				console.error("Failed to sync progress:", err);
+			}
+		}
 	}
 
 	function handleLoadedMetadata() {
@@ -276,7 +315,11 @@
 				class="md:hidden fixed bottom-6 right-6 z-30 w-14 h-14 rounded-full bg-primary shadow-2xl border-2 border-white/20 overflow-hidden flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-primary/40"
 			>
 				{#if $player.image}
-					<img src={$player.image} alt="" class="w-full h-full object-cover" />
+					<img
+						src={$player.image}
+						alt=""
+						class="w-full h-full object-cover"
+					/>
 				{:else}
 					🎙️
 				{/if}
@@ -293,7 +336,11 @@
 					class="w-10 h-10 md:w-16 md:h-16 bg-surface-elevated rounded-lg overflow-hidden shrink-0 border border-white/5 flex"
 				>
 					{#if $player.image}
-						<img src={$player.image} alt="" class="w-full h-full object-cover" />
+						<img
+							src={$player.image}
+							alt=""
+							class="w-full h-full object-cover"
+						/>
 					{:else}
 						<div
 							class="w-full h-full bg-linear-to-br from-primary-container/20 to-black flex items-center justify-center text-lg md:text-2xl"
@@ -374,19 +421,26 @@
 
 			<!-- Volume/Extra -->
 			<div class="flex items-center justify-end gap-3 w-1/4 md:w-1/3">
-				<button 
-					onclick={() => volume = volume === 0 ? 0.7 : 0}
+				<button
+					onclick={() => (volume = volume === 0 ? 0.7 : 0)}
 					class="text-on-surface-variant hover:text-on-surface transition-colors text-sm hidden sm:block"
 				>
-					{volume > 0.5 ? '🔊' : volume > 0 ? '🔉' : '🔇'}
+					{volume > 0.5 ? "🔊" : volume > 0 ? "🔉" : "🔇"}
 				</button>
 				<div class="w-24 md:w-32 group flex items-center relative h-6">
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						onclick={(e) => {
-							const rect = e.currentTarget.getBoundingClientRect();
-							volume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+							const rect =
+								e.currentTarget.getBoundingClientRect();
+							volume = Math.max(
+								0,
+								Math.min(
+									1,
+									(e.clientX - rect.left) / rect.width,
+								),
+							);
 						}}
 						role="slider"
 						aria-valuemin={0}

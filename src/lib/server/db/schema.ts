@@ -27,7 +27,9 @@ export const episodes = sqliteTable('episodes', {
 	audioUrl: text('audio_url').notNull(),
 	pubDate: text('pub_date').notNull(),
 	downloadedDate: integer('downloaded_date', { mode: 'timestamp' }),
-	exemptCleanup: integer('exempt_cleanup', { mode: 'boolean' }).default(false)
+	exemptCleanup: integer('exempt_cleanup', { mode: 'boolean' }).default(false),
+	listenProgress: integer('listen_progress').default(0),
+	completed: integer('completed', { mode: 'boolean' }).default(false)
 }, (table) => [
 	index('episode_title_idx').on(table.title)
 ]);
