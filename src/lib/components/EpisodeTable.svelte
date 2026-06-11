@@ -131,7 +131,7 @@
 				<tr
 					class="border-b border-white/5 text-on-surface-variant text-xs font-bold uppercase tracking-widest"
 				>
-					<th class="px-8 py-5 w-16">#</th>
+					<th class="px-8 py-5 w-16 hidden sm:table-cell">#</th>
 					<th class="px-8 py-5">Title</th>
 					<th class="px-8 py-5">Release Date</th>
 					<th class="px-8 py-5 text-right">Status</th>
@@ -150,7 +150,7 @@
 							? 'bg-white/5'
 							: ''} outline-hidden focus:bg-white/10"
 					>
-						<td class="px-8 py-5 text-on-surface-variant font-mono">
+						<td class="px-8 py-5 text-on-surface-variant font-mono hidden sm:table-cell">
 							<span
 								class={isCurrent
 									? "hidden"
@@ -177,7 +177,7 @@
 								<div class="flex flex-col min-w-0">
 									<div class="flex items-center gap-2">
 										<span
-											class="font-bold truncate transition-colors {isCurrent
+											class="font-bold truncate transition-colors text-ellipsis max-w-32 md:max-w-64 lg:max-w-lg {isCurrent
 												? 'text-primary'
 												: 'text-on-surface group-hover:text-primary'}"
 										>
