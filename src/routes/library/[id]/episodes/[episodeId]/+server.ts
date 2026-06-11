@@ -4,7 +4,6 @@ import { episodes } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function PUT({ params, request }) {
-    console.log("HIT");
     const episodeId = parseInt(params.episodeId);
     if (isNaN(episodeId)) {
         throw error(400, 'Invalid episode ID');
