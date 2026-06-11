@@ -8,6 +8,7 @@ export interface PlayerState {
     audioUrl: string | null;
     image: string | null;
     isPlaying: boolean;
+    resumeTime: number | null;
 }
 
 function createPlayerStore() {
@@ -18,13 +19,14 @@ function createPlayerStore() {
         podcastTitle: null,
         audioUrl: null,
         image: null,
-        isPlaying: false
+        isPlaying: false,
+        resumeTime: null
     });
 
     return {
         subscribe,
         play: (
-            episode: { title: string, id: number, audioUrl: string, image?: string | null }, 
+            episode: { title: string, id: number, audioUrl: string, image?: string | null, listenProgress?: number | null }, 
             podcast: { name: string, id: number, image?: string | null }
         ) => {
             set({
@@ -34,11 +36,12 @@ function createPlayerStore() {
                 podcastTitle: podcast.name,
                 audioUrl: episode.audioUrl,
                 image: episode.image || podcast.image || null,
-                isPlaying: true
+                isPlaying: true,
+                resumeTime: episode.listenProgress ?? 0
             });
         },
         toggle: () => update(s => ({ ...s, isPlaying: !s.isPlaying })),
-        stop: () => set({ episodeTitle: null, episodeId: null, podcastTitle: null, podcastId: null, audioUrl: null, image: null, isPlaying: false })
+        stop: () => set({ episodeTitle: null, episodeId: null, podcastTitle: null, podcastId: null, audioUrl: null, image: null, isPlaying: false, resumeTime: null })
     };
 }
 

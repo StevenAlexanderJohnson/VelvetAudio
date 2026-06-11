@@ -41,8 +41,16 @@
 		}
 	});
 
+	let currentEpisodeId = $state<number | null>(null);
+	let shouldResume = false;
+
 	$effect(() => {
 		if ($player.audioUrl && audio) {
+			if (currentEpisodeId !== $player.episodeId) {
+				currentEpisodeId = $player.episodeId;
+				shouldResume = true;
+			}
+
 			if ($player.isPlaying) {
 				audio.play().catch(() => {
 					player.toggle(); // Revert state if browser blocks autoplay
@@ -120,7 +128,15 @@
 	}
 
 	function handleLoadedMetadata() {
-		if (audio) duration = audio.duration;
+		if (audio) {
+			duration = audio.duration;
+			if (shouldResume && $player.resumeTime) {
+				audio.currentTime = $player.resumeTime;
+				currentTime = $player.resumeTime;
+				lastSyncedTime = $player.resumeTime;
+				shouldResume = false;
+			}
+		}
 	}
 
 	function handleSkip(seconds: number) {
