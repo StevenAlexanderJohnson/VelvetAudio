@@ -1,30 +1,13 @@
 <script lang="ts">
 	import { Modal, Button } from "$lib";
-	import { player } from "$lib/player";
+	import { player } from "$lib/player.svelte";
 
 	interface Props {
 		isOpen: boolean;
 		onClose: () => void;
-		currentTime: number;
-		duration: number;
-		volume: number;
-		onSeek: (e: MouseEvent) => void;
-		onSeekKeyDown: (e: KeyboardEvent) => void;
-		onVolumeChange: (volume: number) => void;
-		onSkip: (seconds: number) => void;
 	}
 
-	let { 
-		isOpen, 
-		onClose, 
-		currentTime, 
-		duration, 
-		volume, 
-		onSeek, 
-		onSeekKeyDown, 
-		onVolumeChange, 
-		onSkip 
-	}: Props = $props();
+	let { isOpen, onClose }: Props = $props();
 
 	function formatTime(seconds: number) {
 		if (isNaN(seconds)) return "0:00";
@@ -36,7 +19,23 @@
 	function handleVolumeClick(e: MouseEvent) {
 		const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
 		const newVolume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-		onVolumeChange(newVolume);
+		player.setVolume(newVolume);
+	}
+
+	function handleSeek(e: MouseEvent) {
+		if (!player.duration) return;
+		const div = e.currentTarget as HTMLDivElement;
+		const rect = div.getBoundingClientRect();
+		const percent = (e.clientX - rect.left) / rect.width;
+		player.seek(percent * player.duration);
+	}
+
+	function handleSeekKeyDown(e: KeyboardEvent) {
+		if (e.key === "ArrowRight") {
+			player.skip(5);
+		} else if (e.key === "ArrowLeft") {
+			player.skip(-5);
+		}
 	}
 </script>
 
@@ -51,9 +50,9 @@
 			<div
 				class="w-56 h-56 rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-surface-elevated"
 			>
-				{#if $player.image}
+				{#if player.image}
 					<img
-						src={$player.image}
+						src={player.image}
 						alt=""
 						class="w-full h-full object-cover"
 					/>
@@ -67,10 +66,10 @@
 			</div>
 			<div class="text-center space-y-1 w-full px-4">
 				<h3 class="text-xl font-bold line-clamp-2">
-					{$player.episodeTitle}
+					{player.episodeTitle}
 				</h3>
 				<p class="text-on-surface-variant font-medium">
-					{$player.podcastTitle}
+					{player.podcastTitle}
 				</p>
 			</div>
 		</div>
@@ -80,19 +79,19 @@
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
-				onclick={onSeek}
-				onkeydown={onSeekKeyDown}
+				onclick={handleSeek}
+				onkeydown={handleSeekKeyDown}
 				role="slider"
 				aria-valuemin={0}
-				aria-valuemax={duration}
-				aria-valuenow={currentTime}
+				aria-valuemax={player.duration}
+				aria-valuenow={player.currentTime}
 				tabindex="0"
 				aria-label="Seek progress"
 				class="w-full h-2 bg-white/10 rounded-full cursor-pointer relative"
 			>
 				<div
 					class="h-full bg-primary-container rounded-full relative"
-					style="width: {(currentTime / (duration || 1)) * 100}%"
+					style="width: {(player.currentTime / (player.duration || 1)) * 100}%"
 				>
 					<div
 						class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg"
@@ -102,8 +101,8 @@
 			<div
 				class="flex justify-between text-xs font-mono text-on-surface-variant"
 			>
-				<span>{formatTime(currentTime)}</span>
-				<span>{formatTime(duration)}</span>
+				<span>{formatTime(player.currentTime)}</span>
+				<span>{formatTime(player.duration)}</span>
 			</div>
 		</div>
 
@@ -111,20 +110,20 @@
 		<div class="flex items-center justify-center gap-8">
 			<button
 				class="text-3xl text-on-surface-variant hover:text-on-surface transition-colors"
-				onclick={() => onSkip(-15)}
+				onclick={() => player.skip(-15)}
 			>
 				⟲
 			</button>
 			<button
-				disabled={!$player.audioUrl}
+				disabled={!player.audioUrl}
 				onclick={() => player.toggle()}
 				class="w-16 h-16 flex items-center justify-center rounded-full bg-on-surface text-background hover:scale-105 transition-transform disabled:opacity-50 text-2xl"
 			>
-				{$player.isPlaying ? "⏸" : "▶"}
+				{player.isPlaying ? "⏸" : "▶"}
 			</button>
 			<button
 				class="text-3xl text-on-surface-variant hover:text-on-surface transition-colors"
-				onclick={() => onSkip(15)}
+				onclick={() => player.skip(15)}
 			>
 				⟳
 			</button>
@@ -135,10 +134,10 @@
 			class="flex items-center gap-4 px-4 py-4 bg-white/5 rounded-2xl"
 		>
 			<button
-				onclick={() => onVolumeChange(volume === 0 ? 0.7 : 0)}
+				onclick={() => player.setVolume(player.volume === 0 ? 0.7 : 0)}
 				class="text-on-surface-variant text-xl"
 			>
-				{volume > 0.5 ? "🔊" : volume > 0 ? "🔉" : "🔇"}
+				{player.volume > 0.5 ? "🔊" : player.volume > 0 ? "🔉" : "🔇"}
 			</button>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -147,14 +146,14 @@
 				role="slider"
 				aria-valuemin={0}
 				aria-valuemax={1}
-				aria-valuenow={volume}
+				aria-valuenow={player.volume}
 				tabindex="0"
 				aria-label="Volume"
 				class="flex-1 h-1.5 bg-white/10 rounded-full cursor-pointer relative"
 			>
 				<div
 					class="h-full bg-primary-container rounded-full relative"
-					style="width: {volume * 100}%"
+					style="width: {player.volume * 100}%"
 				>
 					<div
 						class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg"

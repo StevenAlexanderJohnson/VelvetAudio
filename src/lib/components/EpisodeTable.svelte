@@ -3,7 +3,7 @@
 	import InfoSVG from "$lib/assets/info.svelte";
 	import LockSVG from "$lib/assets/lock.svelte";
 	import type { episodes as episodesSchema } from "$lib/server/db/schema";
-	import { player } from "$lib/player";
+	import { player } from "$lib/player.svelte";
 	import { invalidateAll } from "$app/navigation";
 	import { Modal, Button } from "$lib";
 
@@ -28,7 +28,11 @@
 	let errorMessage = $state("");
 
 	function handlePlay(episode: Episode) {
-		player.play(episode, { name: podcastName, id: podcastId, image: podcastImage });
+		player.play(episode, {
+			name: podcastName,
+			id: podcastId,
+			image: podcastImage,
+		});
 	}
 
 	function handleKeyDown(e: KeyboardEvent, episode: Episode) {
@@ -141,7 +145,7 @@
 			</thead>
 			<tbody class="divide-y divide-white/5">
 				{#each episodes as episode, i}
-					{@const isCurrent = $player.audioUrl === episode.audioUrl}
+					{@const isCurrent = player.audioUrl === episode.audioUrl}
 					<tr
 						onclick={() => handlePlay(episode)}
 						onkeydown={(e) => handleKeyDown(e, episode)}
@@ -152,7 +156,9 @@
 							? 'bg-white/5'
 							: ''} outline-hidden focus:bg-white/10"
 					>
-						<td class="px-8 py-5 text-on-surface-variant font-mono hidden sm:table-cell">
+						<td
+							class="px-8 py-5 text-on-surface-variant font-mono hidden sm:table-cell"
+						>
 							<span
 								class={isCurrent
 									? "hidden"
@@ -163,7 +169,7 @@
 									? "text-primary"
 									: "hidden group-hover:block text-primary"}
 							>
-								{$player.isPlaying && isCurrent ? "⏸" : "▶"}
+								{player.isPlaying && isCurrent ? "⏸" : "▶"}
 							</span>
 						</td>
 						<td class="px-8 py-5">
@@ -179,43 +185,77 @@
 								<div class="flex flex-col min-w-0">
 									<div class="flex items-center gap-2">
 										<span
-											class="font-bold truncate transition-colors text-ellipsis max-w-32 md:max-w-64 lg:max-w-lg {isCurrent ? 'text-primary' : 'text-on-surface group-hover:text-primary'}"
+											class="font-bold truncate transition-colors text-ellipsis max-w-32 md:max-w-64 lg:max-w-lg {isCurrent
+												? 'text-primary'
+												: 'text-on-surface group-hover:text-primary'}"
 											>{episode.title}</span
 										>
 										{#if episode.exemptCleanup}
-											<span class="text-primary" title="Exempt from cleanup">
+											<span
+												class="text-primary"
+												title="Exempt from cleanup"
+											>
 												<div class="w-3.5 h-3.5">
 													<LockSVG />
 												</div>
 											</span>
 										{/if}
 									</div>
-									<span class="text-xs text-on-surface-variant mt-1"
-										>GUID: {episode.guid.slice(0, 8)}...</span
+									<span
+										class="text-xs text-on-surface-variant mt-1"
 									>
+										GUID: {episode.guid.slice(0, 8)}...
+									</span>
 								</div>
 							</div>
 						</td>
-						<td class="px-8 py-5 text-on-surface-variant text-sm whitespace-nowrap">
-							{new Date(episode.pubDate).toLocaleDateString(undefined, {
-								year: "numeric",
-								month: "short",
-								day: "numeric",
-							})}
+						<td
+							class="px-8 py-5 text-on-surface-variant text-sm whitespace-nowrap"
+						>
+							{new Date(episode.pubDate).toLocaleDateString(
+								undefined,
+								{
+									year: "numeric",
+									month: "short",
+									day: "numeric",
+								},
+							)}
 						</td>
 						<td class="px-8 py-5 text-center">
-							{#if episode.completed}
-								<span class="text-primary font-bold text-[10px] uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md">Done</span>
+							{#if isCurrent}
+								<span
+									class="text-primary font-bold text-[11px] uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md"
+								>
+									{Math.floor(
+										(player.currentTime ?? 0) / 60,
+									)}:{((player.currentTime ?? 0) % 60)
+										.toFixed(0)
+										.toString()
+										.padStart(2, "0")}
+								</span>
+							{:else if episode.completed}
+								<span
+									class="text-primary font-bold text-[10px] uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md"
+								>
+									Done
+								</span>
 							{:else if (episode.listenProgress ?? 0) > 0}
-								<span class="text-on-surface-variant text-xs font-mono">
-									{Math.floor((episode.listenProgress ?? 0) / 60)}:{(
-										(episode.listenProgress ?? 0) % 60
-									)
+								<span
+									class="text-on-surface-variant text-xs font-mono"
+								>
+									{Math.floor(
+										(episode.listenProgress ?? 0) / 60,
+									)}:{((episode.listenProgress ?? 0) % 60)
+										.toFixed(0)
 										.toString()
 										.padStart(2, "0")}
 								</span>
 							{:else}
-								<span class="text-on-surface-variant/30 text-xs">--:--</span>
+								<span
+									class="text-on-surface-variant/30 text-xs"
+								>
+									--:--
+								</span>
 							{/if}
 						</td>
 						<td class="px-8 py-5 text-right">

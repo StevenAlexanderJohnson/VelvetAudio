@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { player } from '$lib/player';
+	import { player } from '$lib/player.svelte.js';
 	import { Button } from '$lib';
 
 	let { data } = $props();
@@ -42,7 +42,7 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 			{#each data.recentEpisodes as episode}
-				{@const isCurrent = $player.audioUrl === episode.audioUrl}
+				{@const isCurrent = player.audioUrl === episode.audioUrl}
 				<button 
 					type="button"
 					onclick={() => handlePlay(episode)}
@@ -61,7 +61,7 @@
 						
 						<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<div class="w-14 h-14 bg-primary-container text-white rounded-full flex items-center justify-center text-xl shadow-2xl hover:scale-110 transition-transform">
-								{isCurrent && $player.isPlaying ? '⏸' : '▶'}
+								{isCurrent && player.isPlaying ? '⏸' : '▶'}
 							</div>
 						</div>
 					</div>
@@ -89,7 +89,7 @@
 			<h3 class="text-2xl font-bold mb-6">Recent Activity</h3>
 			<div class="bg-surface rounded-2xl border border-white/5 overflow-hidden divide-y divide-white/5">
 				{#each data.recentEpisodes.slice(0, 4) as episode}
-					{@const isCurrent = $player.audioUrl === episode.audioUrl}
+					{@const isCurrent = player.audioUrl === episode.audioUrl}
 					<button 
 						type="button"
 						onclick={() => handlePlay(episode)}
@@ -111,7 +111,7 @@
 							</p>
 						</div>
 						<div class="text-primary-container opacity-0 group-hover:opacity-100 transition-opacity">
-							{isCurrent && $player.isPlaying ? 'Playing' : 'Play Now'}
+							{isCurrent && player.isPlaying ? 'Playing' : 'Play Now'}
 						</div>
 					</button>
 				{/each}

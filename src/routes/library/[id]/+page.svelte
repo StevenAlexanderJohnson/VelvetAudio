@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "$lib";
 	import { enhance } from "$app/forms";
-	import { player } from "$lib/player";
+	import { player } from "$lib/player.svelte.js";
 	import { onMount } from "svelte";
 	let { data } = $props();
 
