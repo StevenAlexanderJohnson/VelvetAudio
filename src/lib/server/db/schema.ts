@@ -14,6 +14,7 @@ export const podcast = sqliteTable('podcasts', {
 	image: text('image'),
 	nextRunAt: integer('next_run_at', { mode: 'timestamp' }).notNull(),
 	maxDownloaded: integer('max_downloaded').notNull(),
+	scanInterval: integer('scan_interval').notNull().default(60),
 }, (table) => [
 	index('next_run_idx').on(table.nextRunAt),
 ]);

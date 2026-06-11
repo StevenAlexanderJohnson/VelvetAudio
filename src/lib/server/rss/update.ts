@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, max } from "drizzle-orm";
+import { and, eq, isNotNull, lte, max } from "drizzle-orm";
 import { db } from "../db";
 import { episodes, podcast } from "../db/schema";
 import { DownloadEpisode } from "./download";
@@ -6,8 +6,10 @@ import ScanRssFeeds from "./scan";
 
 export async function UpdateRssFeeds(): Promise<App.RssFeedResult> {
     try {
-        // 1. Get ALL podcasts for testing (ignore scheduling for now)
+        // 1. Get podcasts that are due for scanning
+        const now = new Date();
         const scanPodcasts = await db.query.podcast.findMany({
+            where: lte(podcast.nextRunAt, now),
             columns: {
                 id: true,
                 rssUrl: true,
@@ -16,10 +18,10 @@ export async function UpdateRssFeeds(): Promise<App.RssFeedResult> {
         });
 
         if (scanPodcasts.length === 0) {
-            return { success: false, message: "No podcasts found in library.", status: 404 };
+            return { success: true, message: "No podcasts due for scanning.", status: 200 };
         }
 
-        console.log(`Starting scan for ${scanPodcasts.length} podcasts`);
+        console.log(`Starting scan for ${scanPodcasts.length} podcasts due for update`);
 
         const scannedPodcasts = await ScanRssFeeds(scanPodcasts.map((x) =>
             ({ id: x.id, feedUrl: x.rssUrl })
@@ -152,9 +154,10 @@ async function ProcessScannedPodcast(p: App.PodcastMetadata & { id: number }): P
             }
         }
 
-        // Update next run time
+        // Update next run time based on scan interval (convert minutes to ms)
+        const nextRun = new Date(Date.now() + (dbPodcast.scanInterval * 60 * 1000));
         await db.update(podcast)
-            .set({ nextRunAt: new Date(Date.now() + 24 * 60 * 60 * 1000) })
+            .set({ nextRunAt: nextRun })
             .where(eq(podcast.id, p.id));
 
         return { success: true, message: `Scan complete. Synced ${episodesSynced} episodes. Downloaded ${episodesDownloaded} new episodes.`, status: 200 };

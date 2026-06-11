@@ -223,7 +223,7 @@
 	onClose={() => (isInfoModalOpen = false)}
 	title="Podcast Information"
 >
-	<div class="space-y-6">
+	<form method="POST" action="?/updateSettings" use:enhance class="space-y-6">
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 			<div>
 				<p
@@ -237,25 +237,53 @@
 				<p
 					class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
 				>
-					Max Downloaded
+					RSS Feed URL
 				</p>
-				<p class="text-on-surface font-semibold">
-					{data.podcast.maxDownloaded} Episodes
+				<p
+					class="text-on-surface font-mono text-xs break-all p-3 bg-black/20 rounded-lg border border-white/5"
+				>
+					{data.podcast.rssUrl}
 				</p>
 			</div>
 		</div>
 
-		<div>
-			<p
-				class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
-			>
-				RSS Feed URL
-			</p>
-			<p
-				class="text-on-surface font-mono text-sm break-all p-3 bg-black/20 rounded-lg border border-white/5"
-			>
-				{data.podcast.rssUrl}
-			</p>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div>
+				<p
+					class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2"
+				>
+					Max Downloaded Episodes
+				</p>
+				<Input
+					name="maxDownloaded"
+					type="number"
+					value={data.podcast.maxDownloaded.toString()}
+					min="1"
+					max="50"
+					required
+				/>
+				<p class="text-[10px] text-on-surface-variant mt-1">
+					Number of recent episodes to keep downloaded.
+				</p>
+			</div>
+			<div>
+				<p
+					class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2"
+				>
+					Scan Interval (Minutes)
+				</p>
+				<Input
+					name="scanInterval"
+					type="number"
+					value={data.podcast.scanInterval.toString()}
+					min="15"
+					step="15"
+					required
+				/>
+				<p class="text-[10px] text-on-surface-variant mt-1">
+					How often to check for new episodes.
+				</p>
+			</div>
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -265,7 +293,7 @@
 				>
 					Next Sync Scheduled
 				</p>
-				<p class="text-on-surface">
+				<p class="text-on-surface text-sm">
 					{new Date(data.podcast.nextRunAt).toLocaleString(
 						undefined,
 						{
@@ -281,22 +309,30 @@
 				>
 					Library Stats
 				</p>
-				<p class="text-on-surface">
+				<p class="text-on-surface text-sm">
 					{data.total} Total Episodes
 				</p>
 			</div>
 		</div>
 
-		<div class="pt-4 border-t border-white/5">
+		<div class="pt-4 border-t border-white/5 flex gap-3">
 			<Button
 				variant="secondary"
 				onclick={() => (isInfoModalOpen = false)}
-				class="w-full"
+				class="flex-1"
 			>
 				Close
 			</Button>
+			<Button
+				type="submit"
+				variant="primary"
+				class="flex-1"
+				onclick={() => setTimeout(() => isInfoModalOpen = false, 100)}
+			>
+				Save Settings
+			</Button>
 		</div>
-	</div>
+	</form>
 </Modal>
 
 <!-- Delete Modal -->

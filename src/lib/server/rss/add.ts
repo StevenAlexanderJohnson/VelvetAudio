@@ -28,6 +28,7 @@ export async function AddRssFeed(feedUrl: string, requestId?: string): Promise<A
             image: feed.image,
             nextRunAt: new Date(),
             maxDownloaded: 5,
+            scanInterval: 60, // Default to 1 hour
         }).returning();
 
         emit({ type: 'found_episodes', count: feed.episodes.length });
