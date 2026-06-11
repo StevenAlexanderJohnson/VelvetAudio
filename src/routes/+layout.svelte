@@ -320,7 +320,7 @@
 			>
 				<div class="flex items-center gap-4 md:gap-6">
 					<button
-						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
+						class="text-on-surface-variant hover:text-on-surface transition-colors xs:block"
 						onclick={() => audio && (audio.currentTime -= 15)}
 						>⟲</button
 					>
@@ -332,7 +332,7 @@
 						{$player.isPlaying ? "⏸" : "▶"}
 					</button>
 					<button
-						class="text-on-surface-variant hover:text-on-surface transition-colors hidden xs:block"
+						class="text-on-surface-variant hover:text-on-surface transition-colors xs:block"
 						onclick={() => audio && (audio.currentTime += 15)}
 						>⟳</button
 					>
