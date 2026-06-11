@@ -289,18 +289,18 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 			<div>
 				<p
-					class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
+					class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2"
 				>
 					Next Sync Scheduled
 				</p>
-				<p class="text-on-surface text-sm">
-					{new Date(data.podcast.nextRunAt).toLocaleString(
-						undefined,
-						{
-							dateStyle: "medium",
-							timeStyle: "short",
-						},
-					)}
+				<Input
+					name="nextRunAt"
+					type="datetime-local"
+					value={new Date(new Date(data.podcast.nextRunAt).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+					required
+				/>
+				<p class="text-[10px] text-on-surface-variant mt-1">
+					When the background worker will next scan this podcast.
 				</p>
 			</div>
 			<div>

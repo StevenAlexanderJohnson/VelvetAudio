@@ -7,7 +7,7 @@ import { formatFileName } from './utils';
 import fs from 'node:fs/promises';
 
 export async function CleanupRssFeeds(): Promise<App.RssFeedResult> {
-    let allPodcasts = await db.query.podcast.findMany({
+    const allPodcasts = await db.query.podcast.findMany({
         columns: {
             id: true
         }
@@ -24,44 +24,53 @@ export async function CleanupRssFeeds(): Promise<App.RssFeedResult> {
     return { success: true, message: 'Cleanup process completed for all podcasts.', status: 200 };
 }
 
-export async function CleanupRssFeed(postcastId: number): Promise<App.RssFeedResult> {
-    let feed = await db.query.podcast.findFirst({
-        where: eq(podcast.id, postcastId)
+export async function CleanupRssFeed(podcastId: number): Promise<App.RssFeedResult> {
+    const feed = await db.query.podcast.findFirst({
+        where: eq(podcast.id, podcastId)
     });
     if (!feed) {
         return { success: false, message: 'Podcast not found.', status: 404 };
     }
-    let downloadedEpisodes = await db.query.episodes.findMany({
+    const downloadedEpisodes = await db.query.episodes.findMany({
         where: and(
-            eq(episodes.podcastId, postcastId),
+            eq(episodes.podcastId, podcastId),
             isNotNull(episodes.downloadedDate),
             eq(episodes.exemptCleanup, false)
         )
     });
-    if (downloadedEpisodes.length === 0) {
-        return { success: false, message: 'No downloaded episodes found for this podcast.', status: 404 };
-    }
+    
     if (downloadedEpisodes.length <= feed.maxDownloaded) {
         return { success: true, message: 'Podcast is at or below max downloaded episodes. No cleanup needed.', status: 200 };
     }
 
-    // sort by downloaded date assuming that if they manually downloaded an episode, they want to keep it longer than the ones
-    // that were automatically downloaded by the system. So we will sort by downloaded date and delete the oldest ones first.
+    // Sort by downloaded date (oldest first)
     downloadedEpisodes.sort((a, b) => new Date(a.downloadedDate!).getTime() - new Date(b.downloadedDate!).getTime());
 
     const downloadPath = join(env.DOWNLOAD_PATH || './downloads', feed.name);
-    console.log(`Podcast ${feed.name} has ${downloadedEpisodes.length} downloaded episodes. Max allowed is ${feed.maxDownloaded}. Deleting ${downloadedEpisodes.length - feed.maxDownloaded} old episodes.`);
-    const episodesToDelete = downloadedEpisodes.slice(0, downloadedEpisodes.length - feed.maxDownloaded);
+    const countToDelete = downloadedEpisodes.length - feed.maxDownloaded;
+    console.log(`Podcast ${feed.name} has ${downloadedEpisodes.length} downloaded episodes. Max allowed is ${feed.maxDownloaded}. Deleting ${countToDelete} oldest episodes.`);
+    
+    const episodesToDelete = downloadedEpisodes.slice(0, countToDelete);
+    
     for (const episode of episodesToDelete) {
         try {
-            await db.delete(episodes).where(eq(episodes.id, episode.id));
-            let filePath = join(downloadPath, formatFileName(episode.title));
-            await fs.unlink(filePath);
-            console.log(`Deleted episode with id ${episode.id} and file ${filePath}`);
+            // 1. Remove the file
+            const filePath = join(downloadPath, formatFileName(episode.title));
+            await fs.unlink(filePath).catch(err => {
+                if (err.code !== 'ENOENT') throw err;
+                console.warn(`File already missing: ${filePath}`);
+            });
+
+            // 2. Reset the downloaded status in DB (don't delete the record!)
+            await db.update(episodes)
+                .set({ downloadedDate: null })
+                .where(eq(episodes.id, episode.id));
+                
+            console.log(`Deleted file and reset status for episode: ${episode.title}`);
         } catch (err) {
-            console.error(`Failed to delete episode with id ${episode.id}:`, err);
-            return { success: false, message: `Failed to delete episode with id ${episode.id}: ${err}`, status: 500 };
+            console.error(`Failed to cleanup episode "${episode.title}":`, err);
         }
     }
-    return { success: true, message: `Deleted ${episodesToDelete.length} old episodes.`, status: 200 };
+    
+    return { success: true, message: `Successfully cleaned up ${episodesToDelete.length} episodes.`, status: 200 };
 }
