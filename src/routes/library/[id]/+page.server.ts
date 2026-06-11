@@ -33,5 +33,22 @@ export const actions: Actions = {
 		}
 
 		throw redirect(303, '/library');
+	},
+	updateSettings: async ({ params, request }) => {
+		if (!params.id) throw error(400, 'Podcast ID is required');
+		const id = parseInt(params.id);
+		if (isNaN(id)) throw error(400, 'Invalid podcast ID');
+
+		const formData = await request.formData();
+		const maxDownloaded = parseInt(formData.get('maxDownloaded')?.toString() || '5');
+		const scanInterval = parseInt(formData.get('scanInterval')?.toString() || '60');
+		const nextRunAtStr = formData.get('nextRunAt')?.toString();
+		const nextRunAt = nextRunAtStr ? new Date(nextRunAtStr) : new Date();
+
+		await db.update(podcast)
+			.set({ maxDownloaded, scanInterval, nextRunAt })
+			.where(eq(podcast.id, id));
+
+		return { success: true };
 	}
 };

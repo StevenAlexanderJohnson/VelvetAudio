@@ -15,6 +15,13 @@
       "when": 1781143530392,
       "tag": "0001_damp_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781217310291,
+      "tag": "0002_slippery_liz_osborn",
+      "breakpoints": true
     }
   ]
 }

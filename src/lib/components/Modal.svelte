@@ -38,12 +38,12 @@
 
 		<!-- Modal Content -->
 		<div
-			class="relative w-full max-w-lg bg-surface border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
+			class="relative w-full max-w-xl max-h-[80vh] overflow-y-auto bg-surface border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
 		>
 			<div class="p-8">
 				<div class="flex items-center justify-between mb-2">
 					<h2 class="text-2xl font-bold">{title}</h2>
-					<Button variant="ghost" onclick={onClose} class="!p-1 text-on-surface-variant hover:text-on-surface">
+					<Button variant="ghost" onclick={onClose} class="p-1! text-on-surface-variant hover:text-on-surface">
 						✕
 					</Button>
 				</div>

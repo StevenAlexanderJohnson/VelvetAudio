@@ -1,0 +1,1 @@
+ALTER TABLE `podcasts` ADD `scan_interval` integer DEFAULT 60 NOT NULL;
