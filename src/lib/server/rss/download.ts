@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { DOWNLOAD_PATH } from '$app/env/private';
 import { join } from "node:path";
 import { createWriteStream } from 'node:fs';
 import { mkdir, readFile } from 'node:fs/promises';
@@ -8,7 +8,7 @@ import { formatFileName } from './utils';
 import NodeID3 from 'node-id3';
 
 export async function DownloadEpisode(podcast: App.PodcastMetadata, episode: App.PodcastEpisode) {
-    const downloadPath = join(env.DOWNLOAD_PATH || './downloads', podcast.title);
+    const downloadPath = join(DOWNLOAD_PATH || './downloads', podcast.title);
 
     const response = await fetch(episode.audioUrl);
     if (!response.ok || !response.body) throw new Error(`Failed to fetch episode: ${response.statusText}`);

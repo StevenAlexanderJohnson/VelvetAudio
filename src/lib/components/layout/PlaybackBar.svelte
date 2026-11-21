@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { player } from "$lib/player.svelte";
+	import { player } from "#lib/player.svelte.ts";
 
 	function formatTime(seconds: number) {
 		if (isNaN(seconds)) return "0:00";
@@ -108,8 +108,7 @@
 			>
 				<div
 					class="h-full bg-primary-container rounded-full relative group-hover:h-1.5 transition-all"
-					style="width: {(player.currentTime / (player.duration || 1)) *
-						100}%"
+					style="width: {player.duration > 0 ? Math.min(100, (player.currentTime / player.duration) * 100) : 0}%"
 				>
 					<div
 						class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -126,7 +125,7 @@
 	<!-- Volume/Extra -->
 	<div class="flex items-center justify-end gap-3 w-1/4 md:w-1/3">
 		<button
-			onclick={() => player.setVolume(player.volume === 0 ? 0.7 : 0)}
+			onclick={() => player.toggleMute()}
 			class="text-on-surface-variant hover:text-on-surface transition-colors text-sm hidden sm:block"
 		>
 			{player.volume > 0.5 ? "🔊" : player.volume > 0 ? "🔉" : "🔇"}

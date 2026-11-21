@@ -1,4 +1,4 @@
-import { UpdateRssFeed } from "$lib/server/rss/update.js";
+import { UpdateRssFeed } from "#lib/server/rss/update.js";
 import { error } from "@sveltejs/kit";
 
 export async function PUT({ params }) {

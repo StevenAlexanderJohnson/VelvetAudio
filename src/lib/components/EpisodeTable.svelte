@@ -1,11 +1,11 @@
 <script lang="ts">
-	import DownloadSVG from "$lib/assets/download.svelte";
-	import InfoSVG from "$lib/assets/info.svelte";
-	import LockSVG from "$lib/assets/lock.svelte";
-	import type { episodes as episodesSchema } from "$lib/server/db/schema";
-	import { player } from "$lib/player.svelte";
-	import { invalidateAll } from "$app/navigation";
-	import { Modal, Button } from "$lib";
+	import DownloadSVG from "#lib/assets/download.svelte";
+	import InfoSVG from "#lib/assets/info.svelte";
+	import LockSVG from "#lib/assets/lock.svelte";
+	import type { episodes as episodesSchema } from "#lib/server/db/schema.ts";
+	import { player } from "#lib/player.svelte.ts";
+	import { refreshAll } from "$app/navigation";
+	import { Modal, Button } from "#lib";
 
 	type Episode = typeof episodesSchema.$inferSelect;
 
@@ -48,7 +48,7 @@
 				method: "PATCH",
 			});
 			if (response.ok) {
-				await invalidateAll();
+				await refreshAll();
 			} else {
 				alert("Failed to toggle lock status");
 			}
@@ -76,7 +76,7 @@
 				progressStage = "success";
 				progressMessage = data.message;
 				eventSource.close();
-				invalidateAll();
+				refreshAll();
 			} else if (data.type === "error") {
 				progressStage = "error";
 				errorMessage = data.message;
@@ -155,6 +155,7 @@
 						class="hover:bg-white/5 transition-colors group cursor-pointer {isCurrent
 							? 'bg-white/5'
 							: ''} outline-hidden focus:bg-white/10"
+						id={`${episode.id}`}
 					>
 						<td
 							class="px-8 py-5 text-on-surface-variant font-mono hidden sm:table-cell"

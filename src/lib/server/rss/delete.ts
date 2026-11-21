@@ -4,7 +4,7 @@ import { podcast, episodes } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { env } from '$env/dynamic/private';
+import { DOWNLOAD_PATH } from '$app/env/private';
 
 export async function DeleteRssFeed(podcastId: number): Promise<App.RssFeedResult> {
     const [deletePodcast] = await db.select().from(podcast).where(eq(podcast.id, podcastId)).limit(1);
@@ -14,7 +14,7 @@ export async function DeleteRssFeed(podcastId: number): Promise<App.RssFeedResul
     // Try to delete the podcast files first
     let podcastFilesDeleted = false;
     try {
-        const filePath = join(env.DOWNLOAD_PATH || './downloads', deletePodcast.name);
+        const filePath = join(DOWNLOAD_PATH || './downloads', deletePodcast.name);
         try {
             rmSync(filePath, { recursive: true, force: true });
             console.log(`Deleted file: ${filePath}`);

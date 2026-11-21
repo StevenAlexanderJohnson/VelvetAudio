@@ -1,15 +1,17 @@
 <script lang="ts">
 	import "./layout.css";
-	import favicon from "$lib/assets/favicon.svg";
+	import favicon from "#lib/assets/favicon.svg";
 	import { page } from "$app/state";
-	import { player } from "$lib/player.svelte";
+	import { player } from "#lib/player.svelte.ts";
+	import { browserSettings } from "#lib/settings.svelte.ts";
 	import { 
 		Sidebar, 
 		Header, 
 		PlaybackBar, 
 		UserModal, 
 		PlaybackModal 
-	} from "$lib";
+	} from "#lib";
+    import { afterNavigate } from "$app/navigation";
 
 	let { children } = $props();
 
@@ -20,6 +22,14 @@
 	let isSidebarOpen = $state(false);
 	let isUserModalOpen = $state(false);
 	let isPlaybackModalOpen = $state(false);
+
+	let scrollableArea: HTMLElement | null = $state(null);
+	afterNavigate(({ to }) => {
+		console.log("Navigated to:", to?.url.pathname, "with hash:", to?.url.hash);
+		if (scrollableArea && !to?.url.hash) {
+			scrollableArea.scrollTo({ top: 0, behavior: "smooth" });
+		}
+	})
 
 	// Close sidebar when navigating
 	$effect(() => {
@@ -65,6 +75,25 @@
 	let lastSyncedTime = 0;
 
 	// Database progress sync
+	function syncProgress(time: number) {
+		const podcastId = player.podcastId;
+		const episodeId = player.episodeId;
+		if (!episodeId || !podcastId) return;
+
+		lastSyncedTime = time;
+		browserSettings.updateListenProgress(time);
+		const isNearEnd = player.duration > 0 && time / player.duration > 0.9;
+		fetch(`/library/${podcastId}/episodes/${episodeId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				currentTime: time,
+				completed: isNearEnd,
+			}),
+			keepalive: true,
+		}).catch(err => console.error("Failed to sync progress:", err));
+	}
+
 	$effect(() => {
 		const currentTime = player.currentTime;
 		const podcastId = player.podcastId;
@@ -72,19 +101,17 @@
 
 		// Sync every 5 seconds, or if significantly skipped, or if near end
 		const isSignificantSkip = Math.abs(currentTime - lastSyncedTime) > 5;
-		const isNearEnd = player.duration > 0 && currentTime / player.duration > 0.9;
 		const shouldSync = isSignificantSkip || (currentTime % 5 < 0.3 && Math.abs(currentTime - lastSyncedTime) > 1);
 
 		if (episodeId && podcastId && (isSignificantSkip || shouldSync)) {
-			lastSyncedTime = currentTime;
-			fetch(`/library/${podcastId}/episodes/${episodeId}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					currentTime: currentTime,
-					completed: isNearEnd,
-				}),
-			}).catch(err => console.error("Failed to sync progress:", err));
+			syncProgress(currentTime);
+		}
+	});
+
+	$effect(() => {
+		// Also sync immediately when paused so the server has the exact pause position on refresh
+		if (!player.isPlaying && player.currentTime > 0 && Math.abs(player.currentTime - lastSyncedTime) >= 1) {
+			syncProgress(player.currentTime);
 		}
 	});
 </script>
@@ -122,7 +149,7 @@
 					onOpenUserModal={() => isUserModalOpen = true}
 				/>
 
-				<div class="flex-1 overflow-y-auto pb-24 md:pb-[96px]">
+				<div class="flex-1 overflow-y-auto pb-24 md:pb-[96px]" bind:this={scrollableArea}>
 					{@render children()}
 				</div>
 			</main>

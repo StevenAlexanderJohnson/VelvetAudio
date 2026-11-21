@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Button } from '$lib';
+	import { Button } from '#lib';
 
 	interface Props {
 		isOpen: boolean;

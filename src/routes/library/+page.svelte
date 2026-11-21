@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { invalidateAll, goto } from "$app/navigation";
+	import { refreshAll, goto } from "$app/navigation";
 	import { enhance } from "$app/forms";
-	import { Input, Button, Modal } from "$lib";
+	import { Input, Button, Modal } from "#lib";
 
 	let { data, form } = $props();
 	let searchValue = $state("");
@@ -38,7 +38,7 @@
 			const res = await fetch("/api/rss/scan");
 			const result = await res.json();
 			alert(result.message);
-			await invalidateAll();
+			await refreshAll();
 		} catch (e) {
 			alert("Scan failed: " + e);
 		} finally {
@@ -81,7 +81,7 @@
 				progressMessage = data.message;
 				newPodcastId = data.podcastId;
 				eventSource.close();
-				invalidateAll();
+				refreshAll();
 			} else if (data.type === "error") {
 				progressStage = "error";
 				errorMessage = data.message;

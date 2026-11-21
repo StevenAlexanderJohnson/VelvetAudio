@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { DOWNLOAD_PATH } from '$app/env/private';
 import { join } from "node:path";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "../db";
@@ -46,7 +46,7 @@ export async function CleanupRssFeed(podcastId: number): Promise<App.RssFeedResu
     // Sort by downloaded date (oldest first)
     downloadedEpisodes.sort((a, b) => new Date(a.downloadedDate!).getTime() - new Date(b.downloadedDate!).getTime());
 
-    const downloadPath = join(env.DOWNLOAD_PATH || './downloads', feed.name);
+    const downloadPath = join(DOWNLOAD_PATH || './downloads', feed.name);
     const countToDelete = downloadedEpisodes.length - feed.maxDownloaded;
     console.log(`Podcast ${feed.name} has ${downloadedEpisodes.length} downloaded episodes. Max allowed is ${feed.maxDownloaded}. Deleting ${countToDelete} oldest episodes.`);
     
@@ -56,7 +56,7 @@ export async function CleanupRssFeed(podcastId: number): Promise<App.RssFeedResu
         try {
             // 1. Remove the file
             const filePath = join(downloadPath, formatFileName(episode.title));
-            await fs.unlink(filePath).catch(err => {
+            await fs.unlink(filePath).catch((err) => {
                 if (err.code !== 'ENOENT') throw err;
                 console.warn(`File already missing: ${filePath}`);
             });

@@ -1,4 +1,4 @@
-import { progressManager } from '$lib/server/rss/events';
+import { progressManager } from '#lib/server/rss/events.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = ({ url }) => {

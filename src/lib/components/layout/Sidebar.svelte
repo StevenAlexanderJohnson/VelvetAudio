@@ -1,5 +1,5 @@
 <script lang="ts">
-	import logo from "$lib/assets/Velvet Audio Transparent.png";
+	import logo from "#lib/assets/Velvet Audio Transparent.png";
 	import { page } from "$app/state";
 
 	interface Props {

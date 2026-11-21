@@ -1,14 +1,17 @@
-/// <reference types="@sveltejs/kit" />
-import { build, files, version } from '$service-worker';
+import { version } from '$app/env';
+import { assets, immutable, prerendered } from '$app/manifest';
+import { asset, resolve } from '$app/paths';
+import { self } from '$app/service-worker';
 
 const CACHE = `cache-${version}`;
 
 const ASSETS = [
-	...build, // the app itself
-	...files  // everything in `static`
+	...immutable.map((file) => asset(file.path as any)), // the app itself
+	...assets.map((file) => asset(file.path)), // everything in `static`
+	...prerendered.map((file) => resolve(file.path))
 ];
 
-self.addEventListener('install', (event: any) => {
+self.addEventListener('install', (event) => {
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
@@ -17,7 +20,7 @@ self.addEventListener('install', (event: any) => {
 	event.waitUntil(addFilesToCache());
 });
 
-self.addEventListener('activate', (event: any) => {
+self.addEventListener('activate', (event) => {
 	async function deleteOldCaches() {
 		for (const key of await caches.keys()) {
 			if (key !== CACHE) await caches.delete(key);
@@ -27,14 +30,14 @@ self.addEventListener('activate', (event: any) => {
 	event.waitUntil(deleteOldCaches());
 });
 
-self.addEventListener('fetch', (event: any) => {
+self.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET') return;
 
 	async function respond() {
 		const url = new URL(event.request.url);
 		const cache = await caches.open(CACHE);
 
-		// `build`/`files` can always be served from the cache
+		// `immutable`/`assets` can always be served from the cache
 		if (ASSETS.includes(url.pathname)) {
 			const response = await cache.match(url.pathname);
 			if (response) return response;
@@ -47,9 +50,10 @@ self.addEventListener('fetch', (event: any) => {
 
 			if (response.status === 200) {
 				// Cache external images (podcast covers)
-				if (url.origin !== self.location.origin && (
-                    response.headers.get('content-type')?.startsWith('image/')
-                )) {
+				if (
+					url.origin !== self.location.origin &&
+					response.headers.get('content-type')?.startsWith('image/')
+				) {
 					cache.put(event.request, response.clone());
 				}
 			}

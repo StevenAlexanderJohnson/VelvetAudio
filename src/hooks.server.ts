@@ -1,8 +1,10 @@
-import { validateSessionToken } from '$lib/server/auth';
-import { db, runMigrations } from '$lib/server/db';
-import { user } from '$lib/server/db/schema';
-import { redirect, type Handle } from '@sveltejs/kit';
-import { initWorker } from '$lib/server/worker';
+import { redirect } from '@sveltejs/kit';
+import { building } from '$app/env';
+import type { Handle } from '@sveltejs/kit/hooks';
+import { validateSessionToken } from '#lib/server/auth.ts';
+import { db, runMigrations } from '#lib/server/db/index.ts';
+import { user } from '#lib/server/db/schema.ts';
+import { initWorker } from '#lib/server/worker.ts';
 
 // Synchronous initialization wrapper
 async function initialize() {
@@ -18,7 +20,9 @@ async function initialize() {
 }
 
 // Fire and forget the initialization but keep the sequence internal
-initialize();
+if (!building) {
+	initialize();
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get('session');

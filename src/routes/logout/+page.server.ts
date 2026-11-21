@@ -1,4 +1,4 @@
-import { invalidateSession } from '$lib/server/auth';
+import { invalidateSession } from '#lib/server/auth.ts';
 import { redirect, type Actions } from '@sveltejs/kit';
 
 export const actions: Actions = {

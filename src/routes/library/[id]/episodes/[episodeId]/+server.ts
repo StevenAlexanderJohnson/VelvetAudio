@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { episodes } from '$lib/server/db/schema';
+import { error } from '@sveltejs/kit';
+import { db } from '#lib/server/db/index.ts';
+import { episodes } from '#lib/server/db/schema.ts';
 import { eq } from 'drizzle-orm';
 
 export async function PUT({ params, request }) {
@@ -19,7 +19,7 @@ export async function PUT({ params, request }) {
             })
             .where(eq(episodes.id, episodeId));
 
-        return json({ success: true });
+        return Response.json({ success: true });
     } catch (err) {
         console.error('Error updating episode progress:', err);
         throw error(500, 'Internal server error');

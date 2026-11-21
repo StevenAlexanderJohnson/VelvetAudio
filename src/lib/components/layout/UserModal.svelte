@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Modal, Button } from "$lib";
+	import { Modal, Button } from "#lib";
 
 	interface Props {
 		isOpen: boolean;

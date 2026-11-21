@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Modal, Button } from "$lib";
-	import { player } from "$lib/player.svelte";
+	import { Modal, Button } from "#lib";
+	import { player } from "#lib/player.svelte.ts";
 
 	interface Props {
 		isOpen: boolean;
@@ -91,7 +91,7 @@
 			>
 				<div
 					class="h-full bg-primary-container rounded-full relative"
-					style="width: {(player.currentTime / (player.duration || 1)) * 100}%"
+					style="width: {player.duration > 0 ? Math.min(100, (player.currentTime / player.duration) * 100) : 0}%"
 				>
 					<div
 						class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg"
@@ -134,7 +134,7 @@
 			class="flex items-center gap-4 px-4 py-4 bg-white/5 rounded-2xl"
 		>
 			<button
-				onclick={() => player.setVolume(player.volume === 0 ? 0.7 : 0)}
+				onclick={() => player.toggleMute()}
 				class="text-on-surface-variant text-xl"
 			>
 				{player.volume > 0.5 ? "🔊" : player.volume > 0 ? "🔉" : "🔇"}

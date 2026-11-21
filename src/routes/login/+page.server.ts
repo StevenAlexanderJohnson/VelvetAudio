@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
-import { user } from '$lib/server/db/schema';
-import { verifyPassword, createSession, generateSessionToken } from '$lib/server/auth';
+import { db } from '#lib/server/db/index.ts';
+import { user } from '#lib/server/db/schema.ts';
+import { verifyPassword, createSession, generateSessionToken } from '#lib/server/auth.ts';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 import type { Actions } from './$types';

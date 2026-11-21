@@ -24,7 +24,7 @@
 </script>
 
 <button
-	class="{variantStyles[variant]} transition-all duration-200 disabled:opacity-50 disabled:scale-100 {className}"
+	class="{variantStyles[variant]} cursor-pointer transition-all duration-200 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed {className}"
 	{...rest}
 >
 	{@render children?.()}

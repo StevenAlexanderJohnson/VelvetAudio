@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Input, Button } from '$lib';
+	import { Input, Button } from '#lib';
 	import { enhance } from '$app/forms';
 
 	let { data, form } = $props();

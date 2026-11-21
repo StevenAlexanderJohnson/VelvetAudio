@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { getEpisodesPage } from '$lib/server/db/episodes.js';
+import { getEpisodesPage } from '#lib/server/db/episodes.js';
 
 export async function GET({ params, url }) {
     const id = parseInt(params.id);
@@ -15,10 +15,12 @@ export async function GET({ params, url }) {
         throw error(400, 'Invalid page size');
     }
     const searchValue = url.searchParams.get('search') || '';
+    const sortParam = url.searchParams.get('sort');
+    const sortOrder: 'asc' | 'desc' = sortParam === 'asc' ? 'asc' : 'desc';
 
     try {
-        const data = await getEpisodesPage(searchValue, id, page, pageSize);
-        return new Response(JSON.stringify(data), { status: 200 });
+        const data = await getEpisodesPage(searchValue, id, page, pageSize, sortOrder);
+        return Response.json(data);
     } catch (err) {
         console.error(err);
         throw error(500, 'Internal server error');

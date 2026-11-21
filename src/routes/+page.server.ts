@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
-import { episodes, podcast } from '$lib/server/db/schema';
-import { desc, isNotNull, eq } from 'drizzle-orm';
+import { db } from '#lib/server/db/index.ts';
+import { episodes, podcast } from '#lib/server/db/schema.ts';
+import { count, desc, isNotNull, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async () => {
 			listenProgress: episodes.listenProgress,
 			podcastId: podcast.id,
 			podcastName: podcast.name,
-            podcastImage: podcast.image
+			podcastImage: podcast.image
 		})
 		.from(episodes)
 		.innerJoin(podcast, eq(episodes.podcastId, podcast.id))
@@ -22,7 +22,14 @@ export const load: PageServerLoad = async () => {
 		.orderBy(desc(episodes.downloadedDate))
 		.limit(8);
 
+	const [{ total }] = await db
+		.select({ total: count() })
+		.from(episodes)
+		.innerJoin(podcast, eq(episodes.podcastId, podcast.id))
+		.where(isNotNull(episodes.downloadedDate));
+
 	return {
-		recentEpisodes
+		recentEpisodes,
+		totalRecentActivity: total
 	};
 };

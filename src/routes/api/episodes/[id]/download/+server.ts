@@ -1,9 +1,9 @@
-import { db } from '$lib/server/db';
-import { episodes, podcast } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { episodes, podcast } from '#lib/server/db/schema.ts';
 import { eq } from 'drizzle-orm';
-import { DownloadEpisode } from '$lib/server/rss/download';
-import { error, json } from '@sveltejs/kit';
-import { progressManager } from '$lib/server/rss/events';
+import { DownloadEpisode } from '#lib/server/rss/download.ts';
+import { error } from '@sveltejs/kit';
+import { progressManager } from '#lib/server/rss/events.ts';
 
 export async function POST({ params, url }) {
     const id = parseInt(params.id);
@@ -69,7 +69,7 @@ export async function POST({ params, url }) {
             .where(eq(episodes.id, id));
 
         emit({ type: 'success', message: `Successfully downloaded ${episode.title}` });
-        return json({ success: true });
+        return Response.json({ success: true });
     } catch (e: any) {
         console.error('Manual download error:', e);
         emit({ type: 'error', message: e.message });

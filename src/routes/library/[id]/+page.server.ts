@@ -1,9 +1,9 @@
-import { db } from '$lib/server/db';
-import { podcast } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { podcast } from '#lib/server/db/schema.ts';
 import { eq } from 'drizzle-orm';
 import { error, redirect, type Actions } from '@sveltejs/kit';
-import { DeleteRssFeed } from '$lib/server/rss/delete.js';
-import { getEpisodesPage } from '$lib/server/db/episodes.js';
+import { DeleteRssFeed } from '#lib/server/rss/delete.js';
+import { getEpisodesPage } from '#lib/server/db/episodes.js';
 
 export const load = async ({ params }) => {
 	const id = parseInt(params.id);

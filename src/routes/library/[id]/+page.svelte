@@ -1,25 +1,59 @@
 <script lang="ts">
-	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "$lib";
+	import { Input, Button, PodcastHeader, EpisodeTable, Modal } from "#lib";
 	import { enhance } from "$app/forms";
-	import { player } from "$lib/player.svelte.js";
+	import { player } from "#lib/player.svelte.js";
+	import { browserSettings, type SortOrder } from "#lib/settings.svelte.ts";
 	import { onMount } from "svelte";
 	let { data } = $props();
 
 	let searchQuery = $state("");
+	let sortOrder = $state<SortOrder>("desc");
 	let isMenuOpen = $state(false);
 	let isDeleteModalOpen = $state(false);
 	let isInfoModalOpen = $state(false);
 	let deleteConfirmName = $state("");
 
-	let allEpisodes = $state(data.episodes);
+	let allEpisodes = $state<typeof data.episodes>([]);
 	let page = $state(1);
-	let totalCount = $state(data.total);
+	let totalCount = $state(0);
+
+	async function fetchFirstPage(order: SortOrder, query: string) {
+		isLoadingMore = true;
+		try {
+			const response = await fetch(
+				`/library/${data.podcast.id}/episodes?page=1&pageSize=20&sort=${order}&search=${encodeURIComponent(query)}`,
+			);
+			if (response.ok) {
+				const newData = await response.json();
+				allEpisodes = newData.episodes;
+				totalCount = newData.total;
+				page = 1;
+			}
+		} catch (err) {
+			console.error("Failed to fetch episodes:", err);
+		} finally {
+			isLoadingMore = false;
+		}
+	}
 
 	$effect(() => {
+		const savedOrder = browserSettings.getPodcastSortOrder(data.podcast.id);
+		sortOrder = savedOrder;
 		allEpisodes = data.episodes;
 		totalCount = data.total;
 		page = 1;
+
+		if (savedOrder !== "desc") {
+			fetchFirstPage(savedOrder, searchQuery);
+		}
 	});
+
+	async function toggleSortOrder() {
+		const nextOrder: SortOrder = sortOrder === "desc" ? "asc" : "desc";
+		sortOrder = nextOrder;
+		browserSettings.setPodcastSortOrder(data.podcast.id, nextOrder);
+		await fetchFirstPage(nextOrder, searchQuery);
+	}
 
 	let isLoadingMore = $state(false);
 	let hasMore = $derived(allEpisodes.length < totalCount);
@@ -52,7 +86,7 @@
 		
 		try {
 			const nextPage = page + 1;
-			const response = await fetch(`/library/${data.podcast.id}/episodes?page=${nextPage}&pageSize=20&search=${encodeURIComponent(searchQuery)}`);
+			const response = await fetch(`/library/${data.podcast.id}/episodes?page=${nextPage}&pageSize=20&sort=${sortOrder}&search=${encodeURIComponent(searchQuery)}`);
 			if (response.ok) {
 				const newData = await response.json();
 				allEpisodes = [...allEpisodes, ...newData.episodes];
@@ -71,20 +105,7 @@
 	async function handleSearch() {
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(async () => {
-			isLoadingMore = true;
-			try {
-				const response = await fetch(`/library/${data.podcast.id}/episodes?page=1&pageSize=20&search=${encodeURIComponent(searchQuery)}`);
-				if (response.ok) {
-					const newData = await response.json();
-					allEpisodes = newData.episodes;
-					totalCount = newData.total;
-					page = 1;
-				}
-			} catch (err) {
-				console.error("Search failed:", err);
-			} finally {
-				isLoadingMore = false;
-			}
+			await fetchFirstPage(sortOrder, searchQuery);
 		}, 300);
 	}
 
@@ -177,6 +198,15 @@
 				oninput={handleSearch} 
 				placeholder="Search episodes..." 
 			/>
+
+			<Button
+				variant="secondary"
+				onclick={toggleSortOrder}
+				class="whitespace-nowrap flex items-center gap-2"
+				title={sortOrder === "desc" ? "Sorted: Newest to Oldest" : "Sorted: Oldest to Newest"}
+			>
+				<span>{sortOrder === "desc" ? "↓ Newest" : "↑ Oldest"}</span>
+			</Button>
 
 			<Button
 				variant={isSyncing ? "secondary" : "primary"}

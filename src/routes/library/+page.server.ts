@@ -1,7 +1,7 @@
-import { db } from '$lib/server/db';
-import { podcast } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { podcast } from '#lib/server/db/schema.ts';
 import { fail } from '@sveltejs/kit';
-import { AddRssFeed } from '$lib/server/rss/add.js';
+import { AddRssFeed } from '#lib/server/rss/add.js';
 
 export const load = async () => {
 	const podcasts = await db.select().from(podcast);

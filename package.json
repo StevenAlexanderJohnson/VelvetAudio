@@ -16,25 +16,29 @@
 		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
+		"@libsql/client": "^0.18.0",
 		"bcryptjs": "^3.0.3",
 		"node-cron": "^4.2.1",
 		"node-id3": "^0.2.9",
-		"@libsql/client": "^0.17.2",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-node": "^5.5.4",
-		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/adapter-node": "^6.0.4",
+		"@sveltejs/kit": "^3.3.1",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.2",
-		"@types/node": "^24",
+		"@types/node": "^26.6.6",
 		"@types/node-cron": "^3.0.11",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
-		"svelte": "^5.55.2",
-		"svelte-check": "^4.4.6",
+		"svelte": "^5.57.2",
+		"svelte-check": "^4.7.5",
 		"tailwindcss": "^4.2.2",
-		"typescript": "^6.0.2",
-		"vite": "^8.0.7"
+		"typescript": "^6.0.3",
+		"vite": "^8.0.12"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/*": "./src/lib/*"
 	}
 }

@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
-import { setting } from '$lib/server/db/schema';
-import { initWorker } from '$lib/server/worker';
+import { db } from '#lib/server/db/index.ts';
+import { setting } from '#lib/server/db/schema.ts';
+import { initWorker } from '#lib/server/worker.ts';
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

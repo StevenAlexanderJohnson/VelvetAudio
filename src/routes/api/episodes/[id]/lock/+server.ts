@@ -1,7 +1,7 @@
-import { db } from '$lib/server/db';
-import { episodes } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { episodes } from '#lib/server/db/schema.ts';
 import { eq, sql } from 'drizzle-orm';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 export async function PATCH({ params }) {
     const id = parseInt(params.id);
@@ -16,7 +16,7 @@ export async function PATCH({ params }) {
             .where(eq(episodes.id, id))
             .returning();
 
-        return json({ success: true, exemptCleanup: updated[0].exemptCleanup });
+        return Response.json({ success: true, exemptCleanup: updated[0].exemptCleanup });
     } catch (e: any) {
         throw error(500, e.message);
     }
